@@ -28,6 +28,12 @@ const props = defineProps({
 
   // hide labels when zoomed out below this scale
   labelHideBelowScale: { type: Number, default: 0.25 },
+
+  // show a live readout of the cursor's user-space coordinate
+  showCoordinate: { type: Boolean, default: true },
+
+  // number of decimals for the coordinate readout
+  coordinatePrecision: { type: Number, default: 1 },
 })
 
 const emit = defineEmits(['ready', 'view-change', 'annotation-click', 'annotation-hover'])
@@ -50,6 +56,17 @@ const containerRef = ref(null)
 const imageRef = ref(null)
 const naturalSize = ref({ w: 0, h: 0 })
 const pan = ref({ active: false, startX: 0, startY: 0, moved: false })
+
+// live cursor position in user coordinates (for the readout overlay)
+const pointerUser = ref(null)
+const computedPointerUser = computed(() =>
+  pointerUser.value
+    ? {
+        x: pointerUser.value.ux.toFixed(props.coordinatePrecision),
+        y: pointerUser.value.uy.toFixed(props.coordinatePrecision),
+      }
+    : null,
+)
 
 // buffered mirror of scale/offset, written SYNCHRONOUSLY when the view
 // mutates so the labels computed tracks the image with zero frame lag
@@ -136,6 +153,20 @@ function onPointerUp(e) {
   // We intentionally do nothing here for now.
 }
 
+// ---- live cursor coordinate (independent of pan) ----
+function onPointerMoveContainer(e) {
+  if (!props.showCoordinate) {
+    if (pointerUser.value) pointerUser.value = null
+    return
+  }
+  const rect = containerRef.value.getBoundingClientRect()
+  const pt = screenToUser(e.clientX - rect.left, e.clientY - rect.top)
+  pointerUser.value = pt
+}
+function onPointerLeaveContainer() {
+  pointerUser.value = null
+}
+
 // ---- wheel zoom (anchor at cursor) ----
 function onWheel(e) {
   e.preventDefault()
@@ -217,6 +248,8 @@ defineExpose({
       ref="containerRef"
       class="cmap-container"
       @pointerdown="onPointerDown"
+      @pointermove="onPointerMoveContainer"
+      @pointerleave="onPointerLeaveContainer"
       @wheel="onWheel"
     >
       <!-- transformed image world (GPU-composited) -->
@@ -253,6 +286,11 @@ defineExpose({
         </div>
       </div>
 
+      <!-- live cursor coordinate readout (top-left), hideable via prop -->
+      <div v-if="showCoordinate && computedPointerUser" class="cmap-coordinate">
+        x: {{ computedPointerUser.x }} &nbsp; y: {{ computedPointerUser.y }}
+      </div>
+
       <!-- floating zoom controls: flat horizontal row, grey hover/press -->
       <div class="cmap-controls" role="group" aria-label="map controls">
         <Button icon="pi pi-plus" text @click="zoomIn" aria-label="zoom in" />
@@ -281,6 +319,24 @@ defineExpose({
 }
 .cmap-container:active {
   cursor: grabbing;
+}
+
+/* ---- coordinate readout ---- */
+.cmap-coordinate {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 5;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color: var(--p-surface-700);
+  background: color-mix(in srgb, var(--p-surface-0) 80%, transparent);
+  border: 1px solid var(--p-surface-300);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  pointer-events: none;
 }
 
 /* ---- floating zoom controls: flat grey pill row ---- */
