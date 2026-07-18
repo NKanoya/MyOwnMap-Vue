@@ -37,3 +37,6 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+
+# Local test / dev-only maps (do not commit actual user/base-map files)
+public/maps/

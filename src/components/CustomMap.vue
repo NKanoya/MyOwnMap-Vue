@@ -19,15 +19,19 @@ const props = defineProps({
     validator: (v) => Number.isFinite(v.x) && Number.isFinite(v.y),
   },
 
-  // developer-specified annotations in user coordinates
-  // { id, x, y, text }  — id reserved for future interaction
+  // developer-specified annotations in user coordinates.
+  // { id, x, y, text, level? } — level is 1 (default, always shown),
+  // 2 or 3 (only shown once zoom reaches level2Scale / level3Scale).
   annotations: { type: Array, default: () => [] },
 
   // base font-size (px) for annotations — stays constant regardless of zoom
   labelFontSize: { type: Number, default: 14 },
 
-  // hide labels when zoomed out below this scale
-  labelHideBelowScale: { type: Number, default: 0.25 },
+  // scale thresholds per annotation level (multiplier of natural size).
+  // level 1: always shown · level 2: shown when scale >= level2Scale
+  // level 3: shown when scale >= level3Scale
+  level2Scale: { type: Number, default: 0.4, validator: (v) => v > 0 },
+  level3Scale: { type: Number, default: 0.8, validator: (v) => v > 0 },
 
   // show a live readout of the cursor's user-space coordinate
   showCoordinate: { type: Boolean, default: true },
@@ -77,21 +81,26 @@ const imageTransform = computed(
   () => `translate3d(${state.offsetX}px, ${state.offsetY}px, 0) scale(${state.scale})`,
 )
 
-const labelsVisible = computed(() => state.scale >= props.labelHideBelowScale)
+// minimum scale a given annotation level needs before it shows
+const thresholdForLevel = (level) => {
+  if (level <= 1) return 0
+  if (level === 2) return props.level2Scale
+  return props.level3Scale
+}
 
 // ---- annotations rendered in SCREEN space (outside the transformed world) ----
-// We rely on buffered reactive state (not viewState) so this recomputes in the
-// exact same tick as the image's transform — labels never visibly lag, and
-// because they are never inside a scaled element the text stays crisp at any zoom.
-const positionedLabels = computed(() =>
-  props.annotations.map((a) => {
-    const { px, py } = userToImage(a.x, a.y)
-    const { scale, offsetX, offsetY } = buffered.value
-    const sx = px * scale + offsetX
-    const sy = py * scale + offsetY
-    return { ...a, sx, sy }
-  }),
-)
+// Recomputes in the same tick as the image transform (via buffered) so labels
+// never visibly lag; living outside the scaled world keeps text crisp.
+// Per-level zoom gating: level 1 always, level 2+3 gated by their thresholds.
+const positionedLabels = computed(() => {
+  const { scale, offsetX, offsetY } = buffered.value
+  return props.annotations
+    .filter((a) => scale >= thresholdForLevel(a.level || 1))
+    .map((a) => {
+      const { px, py } = userToImage(a.x, a.y)
+      return { ...a, sx: px * scale + offsetX, sy: py * scale + offsetY }
+    })
+})
 
 // ---- image load ----
 function onImageLoad() {
@@ -266,8 +275,8 @@ defineExpose({
 
       <!-- labels: native HTML in SCREEN space, positioned each frame from
            buffered transform. Never lives inside a scaled element => crisp.
-           JS-driven position, NOT CSS transform. -->
-      <div v-if="labelsVisible" class="cmap-labels">
+           JS-driven position, NOT CSS transform. Per-level zoom gating. -->
+      <div v-if="positionedLabels.length" class="cmap-labels">
         <div
           v-for="a in positionedLabels"
           :key="a.id"

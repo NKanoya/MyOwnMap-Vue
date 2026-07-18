@@ -2,25 +2,35 @@
 import { ref } from 'vue'
 import CustomMap from './components/CustomMap.vue'
 
-// Demo data. Real usage: developer supplies image + origin + annotations.
-const imageSrc = '/maps/sample-map.svg'
+// Test image lives in public/maps/ and is git-ignored — swap in your own.
+const imageSrc = '/maps/test.png'
 
-// Declare pixel (800,500) on the image — the Main Gate — as user (0,0).
+// Origin: some pixel on the image that user-space (0,0) maps to.
 const origin = { x: 800, y: 500 }
 
-// Annotations expressed in user coordinates relative to that origin.
-// +x → right, +y → down, in image-pixel units.
+// Annotations in user coordinates (+x right, +y down, image-pixel units).
+// level: 1 = always shown · 2 = shown at level2Scale · 3 = shown at level3Scale.
 const annotations = [
-  { id: 1, x: -400, y: -260, text: 'Hall A' },
-  { id: 2, x: 80,   y: -120, text: 'Hall B' },
-  { id: 3, x: -260, y: 100,  text: 'Garden' },
-  { id: 4, x: 280,  y: 60,   text: 'Cafeteria' },
-  { id: 5, x: 0,    y: 0,    text: 'Main Gate (origin)' },
+  { id: 1, x: -1200, y: -900,  text: 'Zone North-West',  level: 1 },
+  { id: 2, x: 1100,  y: -800,  text: 'Zone North-East',  level: 1 },
+  { id: 3, x: -1300, y: 700,   text: 'Zone South-West',  level: 1 },
+  { id: 4, x: 1200,  y: 600,   text: 'Zone South-East',  level: 1 },
+  { id: 5, x: 0,     y: 0,     text: 'Origin',           level: 1 },
+  { id: 6, x: -400,  y: -260,  text: 'Hall A',           level: 2 },
+  { id: 7, x: 380,   y: -200,  text: 'Hall B',           level: 2 },
+  { id: 8, x: -300,  y: 260,   text: 'Garden',           level: 2 },
+  { id: 9, x: 420,   y: 200,   text: 'Cafeteria',        level: 2 },
+  { id: 10, x: -120, y: -60,   text: 'Reception desk',   level: 3 },
+  { id: 11, x: 140,  y: 40,    text: 'Storage room',     level: 3 },
+  { id: 12, x: -40,  y: 120,   text: 'Fire exit',        level: 3 },
 ]
+
+// Thresholds exposed so you can demo per-level zoom gating live.
+const level2Scale = ref(0.4)
+const level3Scale = ref(0.8)
 
 const mapRef = ref(null)
 const view = ref(null)
-
 function onViewChange(v) {
   view.value = v
 }
@@ -31,13 +41,28 @@ function onViewChange(v) {
     <h1 style="margin-bottom: 0.25rem;">CustomMap demo</h1>
     <p style="color:#666; margin-top: 0;">
       Origin set at image pixel (800, 500). Drag to pan, scroll to zoom.
+      Labels have 3 visibility levels gated by zoom.
     </p>
+
+    <div style="display:flex; gap:1.2rem; align-items:center; flex-wrap:wrap; margin:0.5rem 0; font-size:0.85rem; color:#555;">
+      <label style="display:flex; align-items:center; gap:0.4rem;">
+        L2 ≥ <input type="range" min="0.05" max="2" step="0.05" v-model.number="level2Scale" />
+        <span style="font-variant-numeric:tabular-nums; width:3ch;">{{ level2Scale.toFixed(2) }}</span>
+      </label>
+      <label style="display:flex; align-items:center; gap:0.4rem;">
+        L3 ≥ <input type="range" min="0.1" max="3" step="0.05" v-model.number="level3Scale" />
+        <span style="font-variant-numeric:tabular-nums; width:3ch;">{{ level3Scale.toFixed(2) }}</span>
+      </label>
+      <span style="color:#999;">(L1 always · L2 at threshold · L3 at higher threshold)</span>
+    </div>
 
     <CustomMap
       ref="mapRef"
       :imageSrc="imageSrc"
       :origin="origin"
       :annotations="annotations"
+      :level2Scale="level2Scale"
+      :level3Scale="level3Scale"
       :showCoordinate="true"
       :coordinatePrecision="1"
       width="100%"
@@ -46,7 +71,7 @@ function onViewChange(v) {
     />
 
     <p v-if="view" style="color:#888; font-size: 0.85rem; margin-top: 0.5rem;">
-      scale: {{ view.scale.toFixed(3) }} · offset: ({{ view.offsetX.toFixed(0) }}, {{ view.offsetY.toFixed(0) }})
+      scale: {{ view.scale.toFixed(3) }} · L2 now {{ view.scale >= level2Scale ? 'visible' : 'hidden' }} · L3 now {{ view.scale >= level3Scale ? 'visible' : 'hidden' }}
     </p>
   </div>
 </template>
