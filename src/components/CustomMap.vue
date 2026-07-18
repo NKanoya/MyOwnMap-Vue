@@ -58,11 +58,14 @@ const imageTransform = computed(
 
 const labelsVisible = computed(() => state.scale >= props.labelHideBelowScale)
 
-// ---- annotations with live screen positions ----
+// ---- annotations, placed in image-pixel space inside the transformed world ----
+// They move/pan/zoom together with the image as one unit. A counter-scale
+// keeps the label's visual size constant regardless of zoom level.
+const inverseScale = computed(() => 1 / Math.max(state.scale, 1e-6))
 const positionedLabels = computed(() =>
   props.annotations.map((a) => {
-    const { sx, sy } = userToScreen(a.x, a.y)
-    return { ...a, sx, sy }
+    const { px, py } = userToImage(a.x, a.y)
+    return { ...a, ix: px, iy: py }
   }),
 )
 
@@ -206,33 +209,36 @@ defineExpose({
       @pointerdown="onPointerDown"
       @wheel="onWheel"
     >
-      <!-- image layer (transformed) -->
-      <img
-        ref="imageRef"
-        class="cmap-image"
-        :src="imageSrc"
-        :alt="imageAlt"
-        draggable="false"
-        @load="onImageLoad"
-      />
+      <!-- One transformed "world": image + labels pan/zoom together -->
+      <div class="cmap-world" :style="{ transform: imageTransform }">
+        <img
+          ref="imageRef"
+          class="cmap-image"
+          :src="imageSrc"
+          :alt="imageAlt"
+          draggable="false"
+          @load="onImageLoad"
+        />
 
-      <!-- label layer (screen-space, does NOT scale) -->
-      <div v-if="labelsVisible" class="cmap-labels">
-        <div
-          v-for="a in positionedLabels"
-          :key="a.id"
-          class="cmap-label"
-          :style="{
-            left: a.sx + 'px',
-            top: a.sy + 'px',
-            fontSize: labelFontSize + 'px',
-          }"
-          data-map-label
-          @click.stop="emit('annotation-click', a)"
-          @mouseenter="emit('annotation-hover', a, $event)"
-        >
-          <span class="cmap-label-dot" />
-          <span class="cmap-label-text">{{ a.text }}</span>
+        <!-- labels live in image-pixel space; counter-scale keeps size fixed -->
+        <div v-if="labelsVisible" class="cmap-labels">
+          <div
+            v-for="a in positionedLabels"
+            :key="a.id"
+            class="cmap-label"
+            :style="{
+              left: a.ix + 'px',
+              top: a.iy + 'px',
+              fontSize: labelFontSize + 'px',
+              transform: `translate(-50%, -100%) scale(${inverseScale})`,
+            }"
+            data-map-label
+            @click.stop="emit('annotation-click', a)"
+            @mouseenter="emit('annotation-hover', a, $event)"
+          >
+            <span class="cmap-label-dot" />
+            <span class="cmap-label-text">{{ a.text }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -262,22 +268,26 @@ defineExpose({
 .cmap-container:active {
   cursor: grabbing;
 }
-.cmap-image {
+.cmap-world {
   position: absolute;
   top: 0;
   left: 0;
   transform-origin: 0 0;
   will-change: transform;
+}
+.cmap-image {
+  display: block;
   pointer-events: none;
 }
 .cmap-labels {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
   pointer-events: none;
 }
 .cmap-label {
   position: absolute;
-  transform: translate(-50%, -100%);
+  transform-origin: 0 0;
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
