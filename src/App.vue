@@ -25,9 +25,9 @@ const annotations = [
   { id: 12, x: -40,  y: 120,   text: 'Fire exit',        level: 3 },
 ]
 
-// Thresholds exposed so you can demo per-level zoom gating live.
-const level2Scale = ref(0.4)
-const level3Scale = ref(0.8)
+// levelThresholds[i] is the zoom scale at which level (i+2) appears.
+const levelThresholds = ref([0.4, 0.8])
+const labelBold = ref(true)
 
 const mapRef = ref(null)
 const view = ref(null)
@@ -45,15 +45,19 @@ function onViewChange(v) {
     </p>
 
     <div style="display:flex; gap:1.2rem; align-items:center; flex-wrap:wrap; margin:0.5rem 0; font-size:0.85rem; color:#555;">
+      <span style="font-weight:600;">Level thresholds:</span>
       <label style="display:flex; align-items:center; gap:0.4rem;">
-        L2 ≥ <input type="range" min="0.05" max="2" step="0.05" v-model.number="level2Scale" />
-        <span style="font-variant-numeric:tabular-nums; width:3ch;">{{ level2Scale.toFixed(2) }}</span>
+        L2 ≥ <input type="range" min="0.05" max="2" step="0.05" v-model.number="levelThresholds[0]" />
+        <span style="font-variant-numeric:tabular-nums; width:3ch;">{{ levelThresholds[0].toFixed(2) }}</span>
       </label>
       <label style="display:flex; align-items:center; gap:0.4rem;">
-        L3 ≥ <input type="range" min="0.1" max="3" step="0.05" v-model.number="level3Scale" />
-        <span style="font-variant-numeric:tabular-nums; width:3ch;">{{ level3Scale.toFixed(2) }}</span>
+        L3 ≥ <input type="range" min="0.1" max="3" step="0.05" v-model.number="levelThresholds[1]" />
+        <span style="font-variant-numeric:tabular-nums; width:3ch;">{{ levelThresholds[1].toFixed(2) }}</span>
       </label>
-      <span style="color:#999;">(L1 always · L2 at threshold · L3 at higher threshold)</span>
+      <label style="display:inline-flex; align-items:center; gap:0.3rem; margin-left:0.5rem;">
+        <input type="checkbox" v-model="labelBold" />
+        bold
+      </label>
     </div>
 
     <CustomMap
@@ -61,8 +65,8 @@ function onViewChange(v) {
       :imageSrc="imageSrc"
       :origin="origin"
       :annotations="annotations"
-      :level2Scale="level2Scale"
-      :level3Scale="level3Scale"
+      :levelThresholds="levelThresholds"
+      :labelBold="labelBold"
       :showCoordinate="true"
       :coordinatePrecision="1"
       width="100%"
@@ -71,7 +75,7 @@ function onViewChange(v) {
     />
 
     <p v-if="view" style="color:#888; font-size: 0.85rem; margin-top: 0.5rem;">
-      scale: {{ view.scale.toFixed(3) }} · L2 now {{ view.scale >= level2Scale ? 'visible' : 'hidden' }} · L3 now {{ view.scale >= level3Scale ? 'visible' : 'hidden' }}
+      scale: {{ view.scale.toFixed(3) }} · L2 {{ view.scale >= levelThresholds[0] ? 'visible' : 'hidden' }} · L3 {{ view.scale >= levelThresholds[1] ? 'visible' : 'hidden' }} · bold: {{ labelBold }}
     </p>
   </div>
 </template>

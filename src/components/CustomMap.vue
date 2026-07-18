@@ -21,17 +21,23 @@ const props = defineProps({
 
   // developer-specified annotations in user coordinates.
   // { id, x, y, text, level? } — level is 1 (default, always shown),
-  // 2 or 3 (only shown once zoom reaches level2Scale / level3Scale).
+  // 2+ (shown once zoom reaches the matching entry in levelThresholds).
   annotations: { type: Array, default: () => [] },
 
   // base font-size (px) for annotations — stays constant regardless of zoom
   labelFontSize: { type: Number, default: 14 },
 
-  // scale thresholds per annotation level (multiplier of natural size).
-  // level 1: always shown · level 2: shown when scale >= level2Scale
-  // level 3: shown when scale >= level3Scale
-  level2Scale: { type: Number, default: 0.4, validator: (v) => v > 0 },
-  level3Scale: { type: Number, default: 0.8, validator: (v) => v > 0 },
+  // toggle label weight — true = bold (700), false = normal (400)
+  labelBold: { type: Boolean, default: true },
+
+  // per-level zoom thresholds (multiplier of natural size), indexed by
+  // (level - 2). level 1 is always shown. level 2 appears once scale >=
+  // levelThresholds[0], level 3 once scale >= levelThresholds[1], etc.
+  levelThresholds: {
+    type: Array,
+    default: () => [0.4, 0.8],
+    validator: (v) => Array.isArray(v) && v.every((n) => Number.isFinite(n) && n > 0),
+  },
 
   // show a live readout of the cursor's user-space coordinate
   showCoordinate: { type: Boolean, default: true },
@@ -81,11 +87,11 @@ const imageTransform = computed(
   () => `translate3d(${state.offsetX}px, ${state.offsetY}px, 0) scale(${state.scale})`,
 )
 
-// minimum scale a given annotation level needs before it shows
+// minimum scale a given annotation level needs before it shows.
+// level 1 → 0 (always). level N>=2 → levelThresholds[N-2] (undefined = never).
 const thresholdForLevel = (level) => {
   if (level <= 1) return 0
-  if (level === 2) return props.level2Scale
-  return props.level3Scale
+  return props.levelThresholds[level - 2] ?? Infinity
 }
 
 // ---- annotations rendered in SCREEN space (outside the transformed world) ----
@@ -285,6 +291,7 @@ defineExpose({
             left: a.sx + 'px',
             top: a.sy + 'px',
             fontSize: labelFontSize + 'px',
+            fontWeight: labelBold ? 700 : 400,
           }"
           data-map-label
           @click.stop="emit('annotation-click', a)"
