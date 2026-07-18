@@ -1,21 +1,62 @@
 {
-  "name": "my-own-map-vue",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@your-scope/custom-map-vue",
+  "version": "0.1.0",
+  "description": "Self-rolled PrimeVue-flavored image-map component for Vue 3 — any image, pan/zoom, pixel-space annotations with per-level zoom gating.",
   "type": "module",
+  "private": false,
+  "license": "MIT",
+  "keywords": ["vue", "vue3", "map", "image-map", "pan", "zoom", "annotation", "primevue"],
+  "homepage": "https://github.com/your-scope/custom-map-vue",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-scope/custom-map-vue.git"
+  },
+  "bugs": "https://github.com/your-scope/custom-map-vue/issues",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/types.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./style": "./dist/index.css"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/index.cjs",
+    "dist/index.css",
+    "dist/types.d.ts",
+    "src/components/CustomMap.vue",
+    "src/composables/useMapTransform.js",
+    "src/index.js",
+    "README.md",
+    "README.zh.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "**/*.css",
+    "**/*.vue"
+  ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "vite build --outDir dist-demo",
+    "preview": "vite preview",
+    "build:lib": "vite build --config vite.lib.config.js && cp src/types.d.ts dist/types.d.ts",
+    "prepublishOnly": "npm run build:lib"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@primeuix/themes": "^3.0.0",
     "primeicons": "^8.0.0",
     "primevue": "^5.0.0",
-    "vue": "^3.5.38"
+    "vue": "^3.5.0"
   },
   "devDependencies": {
+    "@primeuix/themes": "^3.0.0",
     "@vitejs/plugin-vue": "^6.0.7",
+    "primeicons": "^8.0.0",
+    "primevue": "^5.0.0",
     "vite": "^8.0.16",
     "vite-plugin-vue-devtools": "^8.1.2"
   },
