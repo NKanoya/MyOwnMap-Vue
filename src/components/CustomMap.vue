@@ -1,7 +1,6 @@
 <script setup>
 import { ref, shallowRef, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useMapTransform } from '@/composables/useMapTransform'
-import Toolbar from 'primevue/toolbar'
 import Button from 'primevue/button'
 
 const props = defineProps({
@@ -214,14 +213,6 @@ defineExpose({
 
 <template>
   <div class="cmap-root" :style="{ width, height }">
-    <Toolbar class="cmap-toolbar">
-      <template #start>
-        <Button icon="pi pi-plus" size="small" text rounded @click="zoomIn" aria-label="zoom in" />
-        <Button icon="pi pi-minus" size="small" text rounded @click="zoomOut" aria-label="zoom-out" />
-        <Button icon="pi pi-refresh" size="small" text rounded @click="resetView" aria-label="reset" />
-      </template>
-    </Toolbar>
-
     <div
       ref="containerRef"
       class="cmap-container"
@@ -261,6 +252,14 @@ defineExpose({
           <span class="cmap-label-text">{{ a.text }}</span>
         </div>
       </div>
+
+      <!-- floating zoom controls (PrimeVue Aura, glassmorphism) -->
+      <div class="cmap-controls" role="group" aria-label="map controls">
+        <Button icon="pi pi-plus" rounded raised @click="zoomIn" aria-label="zoom in" />
+        <Button icon="pi pi-minus" rounded raised @click="zoomOut" aria-label="zoom out" />
+        <span class="cmap-controls-sep" />
+        <Button icon="pi pi-home" rounded raised @click="resetView" aria-label="reset view" />
+      </div>
     </div>
   </div>
 </template>
@@ -269,10 +268,6 @@ defineExpose({
 .cmap-root {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-}
-.cmap-toolbar {
-  flex: none;
 }
 .cmap-container {
   position: relative;
@@ -287,6 +282,32 @@ defineExpose({
 }
 .cmap-container:active {
   cursor: grabbing;
+}
+
+/* ---- floating zoom controls ---- */
+.cmap-controls {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--p-surface-0) 75%, transparent);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border: 1px solid color-mix(in srgb, var(--p-surface-300) 70%, transparent);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+.cmap-controls-sep {
+  display: block;
+  width: 1.6rem;
+  height: 1px;
+  margin: 0.15rem 0;
+  background: var(--p-surface-300);
 }
 .cmap-world {
   position: absolute;

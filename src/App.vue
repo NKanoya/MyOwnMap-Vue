@@ -12,7 +12,7 @@ const origin = { x: 800, y: 500 }
 // +x → right, +y → down, in image-pixel units.
 const annotations = [
   { id: 1, x: -400, y: -260, text: 'Hall A' },
-  { id: 2, x: 80,   y: -220, text: 'Hall B' },
+  { id: 2, x: 80,   y: -120, text: 'Hall B' },
   { id: 3, x: -260, y: 100,  text: 'Garden' },
   { id: 4, x: 280,  y: 60,   text: 'Cafeteria' },
   { id: 5, x: 0,    y: 0,    text: 'Main Gate (origin)' },
