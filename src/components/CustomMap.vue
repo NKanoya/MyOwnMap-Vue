@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, shallowRef, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useMapTransform } from '@/composables/useMapTransform'
 import Toolbar from 'primevue/toolbar'
 import Button from 'primevue/button'
@@ -52,6 +52,10 @@ const imageRef = ref(null)
 const naturalSize = ref({ w: 0, h: 0 })
 const pan = ref({ active: false, startX: 0, startY: 0, moved: false })
 
+// buffered mirror of scale/offset, written SYNCHRONOUSLY when the view
+// mutates so the labels computed tracks the image with zero frame lag
+const buffered = shallowRef({ scale: 1, offsetX: 0, offsetY: 0 })
+
 // ---- view transform (what we bind to DOM) ----
 const imageTransform = computed(
   () => `translate3d(${state.offsetX}px, ${state.offsetY}px, 0) scale(${state.scale})`,
@@ -59,14 +63,16 @@ const imageTransform = computed(
 
 const labelsVisible = computed(() => state.scale >= props.labelHideBelowScale)
 
-// ---- annotations, placed in image-pixel space inside the transformed world ----
-// They move/pan/zoom together with the image as one unit. A counter-scale
-// keeps the label's visual size constant regardless of zoom level.
-const inverseScale = computed(() => 1 / Math.max(state.scale, 1e-6))
+// ---- annotations rendered in SCREEN space (outside the transformed world) ----
+// We rely on buffered reactive state (not viewState) so this recomputes in the
+// exact same tick as the image's transform — labels never visibly lag, and
+// because they are never inside a scaled element the text stays crisp at any zoom.
 const positionedLabels = computed(() =>
   props.annotations.map((a) => {
     const { px, py } = userToImage(a.x, a.y)
-    return { ...a, ix: px, iy: py }
+    const sx = px * buffered.scale + buffered.offsetX
+    const sy = py * buffered.scale + buffered.offsetY
+    return { ...a, sx, sy }
   }),
 )
 
@@ -91,7 +97,13 @@ function measureAndFit(forceFit = false) {
     containerH: rect.height,
   })
   if (forceFit) fitToContainer()
+  syncBuffered()
   emitViewChange()
+}
+
+// mirror the readonly transform state into the buffered ref for labels
+function syncBuffered() {
+  buffered.value = { scale: state.scale, offsetX: state.offsetX, offsetY: state.offsetY }
 }
 
 // ---- pointer pan ----
@@ -111,6 +123,7 @@ function onPointerMove(e) {
   pan.value.startX = e.clientX
   pan.value.startY = e.clientY
   panBy(dx, dy)
+  syncBuffered()
   emitViewChange()
 }
 
@@ -130,6 +143,7 @@ function onWheel(e) {
   const ax = e.clientX - rect.left
   const ay = e.clientY - rect.top
   zoomBy(ax, ay, e.deltaY)
+  syncBuffered()
   emitViewChange()
 }
 
@@ -149,16 +163,19 @@ function zoomIn() {
   const cx = state.containerW / 2
   const cy = state.containerH / 2
   zoomAt(cx, cy, 1.25)
+  syncBuffered()
   emitViewChange()
 }
 function zoomOut() {
   const cx = state.containerW / 2
   const cy = state.containerH / 2
   zoomAt(cx, cy, 0.8)
+  syncBuffered()
   emitViewChange()
 }
 function resetView() {
   reset()
+  syncBuffered()
   emitViewChange()
 }
 
@@ -210,7 +227,7 @@ defineExpose({
       @pointerdown="onPointerDown"
       @wheel="onWheel"
     >
-      <!-- One transformed "world": image + labels pan/zoom together -->
+      <!-- transformed image world (GPU-composited) -->
       <div class="cmap-world" :style="{ transform: imageTransform }">
         <img
           ref="imageRef"
@@ -220,26 +237,27 @@ defineExpose({
           draggable="false"
           @load="onImageLoad"
         />
+      </div>
 
-        <!-- labels live in image-pixel space; counter-scale keeps size fixed -->
-        <div v-if="labelsVisible" class="cmap-labels">
-          <div
-            v-for="a in positionedLabels"
-            :key="a.id"
-            class="cmap-label"
-            :style="{
-              left: a.ix + 'px',
-              top: a.iy + 'px',
-              fontSize: labelFontSize + 'px',
-              transform: `translate(-50%, -100%) scale(${inverseScale})`,
-            }"
-            data-map-label
-            @click.stop="emit('annotation-click', a)"
-            @mouseenter="emit('annotation-hover', a, $event)"
-          >
-            <span class="cmap-label-dot" />
-            <span class="cmap-label-text">{{ a.text }}</span>
-          </div>
+      <!-- labels: native HTML in SCREEN space, positioned each frame from
+           buffered transform. Never lives inside a scaled element => crisp.
+           JS-driven position, NOT CSS transform. -->
+      <div v-if="labelsVisible" class="cmap-labels">
+        <div
+          v-for="a in positionedLabels"
+          :key="a.id"
+          class="cmap-label"
+          :style="{
+            left: a.sx + 'px',
+            top: a.sy + 'px',
+            fontSize: labelFontSize + 'px',
+          }"
+          data-map-label
+          @click.stop="emit('annotation-click', a)"
+          @mouseenter="emit('annotation-hover', a, $event)"
+        >
+          <span class="cmap-label-dot" />
+          <span class="cmap-label-text">{{ a.text }}</span>
         </div>
       </div>
     </div>
@@ -288,7 +306,7 @@ defineExpose({
 }
 .cmap-label {
   position: absolute;
-  transform-origin: 0 0;
+  transform: translate(-50%, -100%);
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
