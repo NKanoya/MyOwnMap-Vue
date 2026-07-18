@@ -70,8 +70,9 @@ const labelsVisible = computed(() => state.scale >= props.labelHideBelowScale)
 const positionedLabels = computed(() =>
   props.annotations.map((a) => {
     const { px, py } = userToImage(a.x, a.y)
-    const sx = px * buffered.scale + buffered.offsetX
-    const sy = py * buffered.scale + buffered.offsetY
+    const { scale, offsetX, offsetY } = buffered.value
+    const sx = px * scale + offsetX
+    const sy = py * scale + offsetY
     return { ...a, sx, sy }
   }),
 )
