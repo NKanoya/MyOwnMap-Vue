@@ -387,15 +387,17 @@ defineExpose({
   position: absolute;
   transform: translateX(-50%);
   white-space: nowrap;
-  color: var(--p-surface-900);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.2;
   pointer-events: auto;
   cursor: default;
-  /* crisp halo so the text stays legible over any map content */
+  /* outlined text: readable over any background color (green/blue/white/dark).
+     Falls back to plain white where -webkit-text-stroke is unsupported. */
+  color: #fff;
+  -webkit-text-stroke: 0.6px rgba(0, 0, 0, 0.55);
   text-shadow:
-    0 0 2px #fff,
-    0 0 2px #fff,
-    0 1px 3px rgba(255, 255, 255, 0.6);
+    0 0 2px rgba(0, 0, 0, 0.45),
+    0 1px 3px rgba(0, 0, 0, 0.35);
+  paint-order: stroke fill;
 }
 </style>
