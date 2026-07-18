@@ -253,12 +253,11 @@ defineExpose({
         </div>
       </div>
 
-      <!-- floating zoom controls (PrimeVue Aura, glassmorphism) -->
+      <!-- floating zoom controls: flat horizontal row, grey hover/press -->
       <div class="cmap-controls" role="group" aria-label="map controls">
-        <Button icon="pi pi-plus" rounded raised @click="zoomIn" aria-label="zoom in" />
-        <Button icon="pi pi-minus" rounded raised @click="zoomOut" aria-label="zoom out" />
-        <span class="cmap-controls-sep" />
-        <Button icon="pi pi-home" rounded raised @click="resetView" aria-label="reset view" />
+        <Button icon="pi pi-plus" text @click="zoomIn" aria-label="zoom in" />
+        <Button icon="pi pi-minus" text @click="zoomOut" aria-label="zoom out" />
+        <Button icon="pi pi-home" text @click="resetView" aria-label="reset view" />
       </div>
     </div>
   </div>
@@ -284,30 +283,26 @@ defineExpose({
   cursor: grabbing;
 }
 
-/* ---- floating zoom controls ---- */
+/* ---- floating zoom controls: flat grey pill row ---- */
 .cmap-controls {
   position: absolute;
   right: 1rem;
   bottom: 1rem;
   z-index: 5;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--p-surface-0) 75%, transparent);
-  backdrop-filter: blur(10px) saturate(140%);
-  -webkit-backdrop-filter: blur(10px) saturate(140%);
-  border: 1px solid color-mix(in srgb, var(--p-surface-300) 70%, transparent);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
-}
-.cmap-controls-sep {
-  display: block;
-  width: 1.6rem;
-  height: 1px;
-  margin: 0.15rem 0;
-  background: var(--p-surface-300);
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 0.6rem;
+  background: color-mix(in srgb, var(--p-surface-0) 80%, transparent);
+  border: 1px solid var(--p-surface-300);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+
+  /* force neutral grey interaction — no theme primary color anywhere */
+  --p-button-text-hover-bg: var(--p-surface-200);
+  --p-button-text-active-bg: var(--p-surface-300);
+  --p-button-text-hover-color: var(--p-surface-800);
+  --p-button-text-active-color: var(--p-surface-900);
 }
 .cmap-world {
   position: absolute;
