@@ -20,7 +20,6 @@ const annotations = [
 
 const mapRef = ref(null)
 const view = ref(null)
-const showCoordinate = ref(true)
 
 function onViewChange(v) {
   view.value = v
@@ -39,17 +38,12 @@ function onViewChange(v) {
       :imageSrc="imageSrc"
       :origin="origin"
       :annotations="annotations"
-      :showCoordinate="showCoordinate"
+      :showCoordinate="true"
       :coordinatePrecision="1"
       width="100%"
       height="640px"
       @view-change="onViewChange"
     />
-
-    <label style="display:inline-flex; align-items:center; gap:0.4rem; margin:0.6rem 0 0.3rem; font-size:0.85rem; color:#555; user-select:none;">
-      <input type="checkbox" v-model="showCoordinate" />
-      显示鼠标坐标
-    </label>
 
     <p v-if="view" style="color:#888; font-size: 0.85rem; margin-top: 0.5rem;">
       scale: {{ view.scale.toFixed(3) }} · offset: ({{ view.offsetX.toFixed(0) }}, {{ view.offsetY.toFixed(0) }})
