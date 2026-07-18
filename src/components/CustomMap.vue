@@ -36,6 +36,7 @@ const emit = defineEmits(['ready', 'view-change', 'annotation-click', 'annotatio
 const {
   state,
   configure,
+  userToImage,
   userToScreen,
   screenToUser,
   fitToContainer,
