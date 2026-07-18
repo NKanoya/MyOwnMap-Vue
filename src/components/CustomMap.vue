@@ -280,10 +280,7 @@ defineExpose({
           data-map-label
           @click.stop="emit('annotation-click', a)"
           @mouseenter="emit('annotation-hover', a, $event)"
-        >
-          <span class="cmap-label-dot" />
-          <span class="cmap-label-text">{{ a.text }}</span>
-        </div>
+        >{{ a.text }}</div>
       </div>
 
       <!-- live cursor coordinate readout (top-left), hideable via prop -->
@@ -379,30 +376,17 @@ defineExpose({
 }
 .cmap-label {
   position: absolute;
-  transform: translate(-50%, -100%);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 1px 0.4rem;
+  transform: translateX(-50%);
   white-space: nowrap;
   color: var(--p-surface-900);
-  background: color-mix(in srgb, var(--p-surface-0) 85%, transparent);
-  border: 1px solid var(--p-surface-400);
-  border-radius: 999px;
+  font-weight: 600;
+  line-height: 1.2;
   pointer-events: auto;
   cursor: default;
-  line-height: 1.2;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-}
-.cmap-label-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--p-primary-color);
-  border: 1px solid var(--p-surface-0);
-  flex: none;
-}
-.cmap-label-text {
-  font-weight: 500;
+  /* crisp halo so the text stays legible over any map content */
+  text-shadow:
+    0 0 2px #fff,
+    0 0 2px #fff,
+    0 1px 3px rgba(255, 255, 255, 0.6);
 }
 </style>
