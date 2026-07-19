@@ -118,13 +118,12 @@ const imageTransform = computed(
 )
 
 // minimum scale a given annotation level needs before it shows.
-// - level <= 1 → always visible (tier 1 = default).
-// - level N>=2 → levelThresholds[N-2]; if the entry is missing / undefined
-//   the tier falls back to 0 (always visible), mirroring the `styles[-1]`
-//   out-of-range fallback.
+// - level -1 (default) → always visible — the sentinel, mirrors `styles[-1]`.
+// - level 0,1,2… → reads levelThresholds[i]; a missing / undefined entry
+//   falls back to 0 (always visible). Out-of-range indices always fall back.
 const thresholdForLevel = (level) => {
-  if (level <= 1) return 0
-  const t = props.levelThresholds[level - 2]
+  if (level < 0) return 0
+  const t = props.levelThresholds[level]
   return t == null ? 0 : t
 }
 

@@ -59,10 +59,10 @@ const imageSrc = '/maps/my-map.png'
 const origin = { x: 1200, y: 900 }
 
 const annotations = [
-  { id: 1, x: -500, y: -300, text: 'A 栋',     level: 1 },
-  { id: 2, x:  200, y: -150, text: 'B 栋',     level: 1 },
-  { id: 3, x: -120, y:   60, text: '前台',     level: 2 },
-  { id: 4, x:   80, y:  100, text: '消防通道', level: 3 },
+  { id: 1, x: -500, y: -300, text: 'A 栋',     level: -1 },
+  { id: 2, x:  200, y: -150, text: 'B 栋',     level:  0 },
+  { id: 3, x: -120, y:   60, text: '前台',     level:  1 },
+  { id: 4, x:   80, y:  100, text: '消防通道', level: -1 },
 ]
 </script>
 
@@ -134,17 +134,16 @@ type Annotation = {
 
 ### 层级可见性
 
-`levelThresholds[i]` 是一个**缩放倍率**（相对于图片原始大小），达到后**第
-`i+2` 级**标注开始显示：
+`level[i]` 是一个**缩放倍率**（相对于图片原始大小），达到后**第 `i` 级**
+标注开始显示。**层级编号就是数组下标**：
 
-- 1 级 —— 始终显示（阈值 0）
-- 2 级 —— `scale >= levelThresholds[0]` 时显示（默认 `0.4`）
-- 3 级 —— `scale >= levelThresholds[1]` 时显示（默认 `0.8`）
-- 超出数组长度的层级、以及 `level <= 1` 或对应条目缺失的标注回退为始终显示 ——
+- `-1` 级（默认）—— 始终显示，标记值，与 `styles[-1]` 同语义。
+- `0` 级 —— `scale >= levelThresholds[0]` 时显示（默认 `0.4`）
+- `1` 级 —— `scale >= levelThresholds[1]` 时显示（默认 `0.8`）
+- `2`、`3`、... 级 —— 若对应数组条目缺失 / 越界则回退为始终显示 ——
   与 `styles` prop 的越界回退语义一致。
 
-因此你可以精确控制存在几档、每档在什么缩放比例下出现。被门槛卡住的标注
-干脆不渲染，没有隐藏的 DOM。
+因此你可以精确控制存在几档、每档在什么缩放比例下出现。
 
 ### 按标注独立的样式组
 

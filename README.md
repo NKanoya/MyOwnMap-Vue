@@ -62,10 +62,10 @@ const imageSrc = '/maps/my-map.png'
 const origin = { x: 1200, y: 900 }
 
 const annotations = [
-  { id: 1, x: -500, y: -300, text: 'Building A', level: 1 },
-  { id: 2, x:  200, y: -150, text: 'Building B', level: 1 },
-  { id: 3, x: -120, y:   60, text: 'Reception',  level: 2 },
-  { id: 4, x:   80, y:  100, text: 'Fire exit',  level: 3 },
+  { id: 1, x: -500, y: -300, text: 'Building A', level: -1 },
+  { id: 2, x:  200, y: -150, text: 'Building B', level:  0 },
+  { id: 3, x: -120, y:   60, text: 'Reception',  level:  1 },
+  { id: 4, x:   80, y:  100, text: 'Fire exit',  level: -1 },
 ]
 </script>
 
@@ -139,18 +139,17 @@ type Annotation = {
 
 ### Level visibility
 
-`levelThresholds[i]` is the zoom factor (multiple of the image's natural size)
-at which **level `i+2`** becomes visible:
+`level[i]` is the zoom factor (multiple of the image's natural size) at which
+**level `i`** becomes visible. The level number IS the array index:
 
-- level 1 — always visible (threshold 0)
-- level 2 — visible once `scale >= levelThresholds[0]`  (default `0.4`)
-- level 3 — visible once `scale >= levelThresholds[1]`  (default `0.8`)
-- levels beyond the array length, and any annotation with `level <= 1` or an
-  undefined entry, fall back to always visible — the same out-of-range
-  fallback as the `styles` prop.
+- level `-1` (default) — always visible, the sentinel. Matches `styles[-1]`.
+- level `0` — visible once `scale >= levelThresholds[0]`  (default `0.4`)
+- level `1` — visible once `scale >= levelThresholds[1]`  (default `0.8`)
+- level `2`, `3`, … — if the matching array entry is missing / undefined, the
+  tier falls back to always visible — the same out-of-range fallback as the
+  `styles` prop.
 
 This gives exact control over how many tiers exist and where each kicks in.
-Out-of-gating labels simply don't render.
 
 ### Per-label style groups
 
