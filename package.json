@@ -1,6 +1,6 @@
 {
   "name": "@nkanoya/my-own-map-vue",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Self-rolled PrimeVue-flavored image-map component for Vue 3 — any image, pan/zoom, pixel-space annotations with per-level zoom gating.",
   "type": "module",
   "private": false,
