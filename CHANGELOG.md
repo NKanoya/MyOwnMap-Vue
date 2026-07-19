@@ -4,7 +4,14 @@
 [![license](https://img.shields.io/npm/l/@nkanoya/my-own-map-vue)](./LICENSE)
 [![downloads](https://img.shields.io/npm/dm/@nkanoya/my-own-map-vue)](https://www.npmjs.com/package/@nkanoya/my-own-map-vue)
 
----
+## v0.1.12 (正式)
+
+- 新增 `debug` prop：左键复制 `x: %d, y: %d`，右键复制 `x: %d, y: %d, visible: %.2f`（均复制到剪贴板）。
+- `visible` 语义调整：`<= 0` / 不填 = 始终可见，`> 0` = 缩放 ≥ 该值时显示。
+- 新增规则：`x` 或 `y` 未填的标注默认隐藏（`0` 是合法坐标值，不受影响）。
+- 标注现在在锚点处水平 + 垂直双向居中；有图标时图标对齐锚点、文字在下方。
+- 图标支持圆角背景框（`iconBg` + `iconColor`）。
+- 多行文字 `\n` 每行各自居中，整体块垂直居中于锚点。
 
 ## v0.1.11 (正式)
 
