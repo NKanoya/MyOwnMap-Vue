@@ -116,7 +116,7 @@ const annotations = [
 | `initialScale` | `Number\|null` | `null` | 初始缩放倍率（相对于图片原始尺寸）。`null` 时自动适配容器；设了则以 `initialCenter` 为锚点。 |
 | `initialCenter` | `{ x, y }` | `{ x: 0, y: 0 }` | 初始视口中心（用户坐标，相对原点）。`initialScale` 为 `null` 时忽略。 |
 | `boundaryMargin` | `Number` | `100` | 平移 / 缩放时允许的最大背景边距（px）。地图不能被拖到距容器边超过该距离，也不能缩到比适配容器更小。 |
-| `styles` | `Array<{ fontSize?, color? }>` | `[]` | 标注样式组（与 `level` 正交的另一维度）。每个标注通过 `style` 字段引用一个下标；组内未填写的字段、以及越界 / `-1` 下标均回退到组件默认样式。 |
+| `styles` | `Array<{ fontSize?, fontWeight?, color?, stroke?, textShadow? }>` | `[]` | 标注样式组（与 `level` 正交的另一维度）。每个标注通过 `style` 字段引用一个下标；组内未填写的字段、以及越界 / `-1` 下标均回退到组件默认样式。 |
 | `showCoordinate` | `Boolean` | `true` | 是否显示光标的实时坐标读数。 |
 | `coordinatePrecision` | `Number` | `1` | 坐标读数的小数位数。 |
 

@@ -9,11 +9,12 @@ const imageSrc = '/maps/test.png'
 const origin = { x: 800, y: 500 }
 
 // Style groups (index into the `styles` prop). Independent of `level`.
-// Anything omitted falls back to the component defaults (white, 14px, outlined).
+// Anything omitted falls back to the component defaults (white, 14px, bold, outlined).
 const styles = [
-  {}, // 0: unused (kept to show index-1 is the first real override)
-  { fontSize: 20, color: '#ffd166' }, // 1: 黄色大字
-  { color: '#ff5555' }, // 2: 红色，字号沿用默认
+  {}, // 0: unused
+  { fontSize: 20, color: '#fde047' }, // 1: 亮黄大字
+  { color: '#86efac' }, // 2: 薄荷绿，字号/字重沿用默认
+  { color: '#ffffff', stroke: 'none', textShadow: 'none', fontWeight: 400 }, // 3: 无描边白字
 ]
 
 // Annotations in user coordinates (+x right, +y down, image-pixel units).
@@ -31,7 +32,7 @@ const annotations = [
   { id: 9, x: 420,   y: 200,   text: 'Cafeteria',        level:  0, style: 1 },
   { id: 10, x: -120, y: -60,   text: 'Reception desk',   level:  1, style: 1 },
   { id: 11, x: 140,  y: 40,    text: 'Storage room',     level:  1, style: 2 },
-  { id: 12, x: -40,  y: 120,   text: 'Fire exit',        level:  1, style: -1 },
+  { id: 12, x: -40,  y: 120,   text: 'Fire exit',        level:  1, style: 3 },
 ]
 
 // levelThresholds[i] is the zoom scale at which level i appears (-1 = always).

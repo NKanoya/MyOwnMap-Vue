@@ -141,10 +141,10 @@ function resolveLabelStyle(a) {
   const g = props.styles[a.style]
   return {
     fontSize: g?.fontSize ?? props.labelFontSize,
-    fontWeight: baseFontWeight.value,
+    fontWeight: g?.fontWeight ?? baseFontWeight.value,
     color: g?.color ?? '#fff',
-    stroke: '0.6px rgba(0, 0, 0, 0.55)',
-    textShadow: '0 0 2px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.35)',
+    stroke: g?.stroke ?? '0.6px rgba(0, 0, 0, 0.55)',
+    textShadow: g?.textShadow ?? '0 0 2px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.35)',
   }
 }
 

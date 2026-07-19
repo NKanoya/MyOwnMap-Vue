@@ -124,7 +124,7 @@ from the origin" on the underlying image.
 | `initialScale` | `Number\|null` | `null` | Initial zoom scale (multiple of natural size). When `null` the image auto-fits the container. When set, `initialCenter` is used as the anchor. |
 | `initialCenter` | `{ x, y }` | `{ x: 0, y: 0 }` | Initial view center in user coordinates (relative to origin). Ignored when `initialScale` is `null`. |
 | `boundaryMargin` | `Number` | `100` | Max background margin (px) allowed when panning / zooming. The map can't be panned past this margin beyond the container edge, nor zoomed out smaller than fitting the container. |
-| `styles` | `Array<{ fontSize?, color? }>` | `[]` | Per-label style groups. Each annotation points at one via its `style` index; omitted fields and out-of-range / `-1` indices fall back to the component defaults. Independent of `level`. |
+| `styles` | `Array<{ fontSize?, fontWeight?, color?, stroke?, textShadow? }>` | `[]` | Per-label style groups. Each annotation points at one via its `style` index; omitted fields and out-of-range / `-1` indices fall back to the component defaults. Independent of `level`. |
 | `showCoordinate` | `Boolean` | `true` | Show the live cursor coordinate readout. |
 | `coordinatePrecision` | `Number` | `1` | Decimal places in the readout. |
 
