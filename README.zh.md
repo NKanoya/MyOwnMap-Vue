@@ -111,15 +111,15 @@ const annotations = [
 | `annotations` | `Array` | `[]` | 见 [annotations](#annotations)。 |
 | `labelFontSize` | `Number` | `14` | 标注字号（px）—— 任意缩放下保持不变。 |
 | `labelBold` | `Boolean` | `true` | 标注字重：`true`→700，`false`→400。 |
-| `levelThresholds` | `Array` | `[0.4, 0.8]` | 层级显示阈值（见下文）。 |
 | `pixelated` | `Boolean` | `true` | 底图采用最近邻（nearest-neighbor）缩放——放大后像素锐利清晰，而非浏览器默认的平滑模糊。 |
 | `initialScale` | `Number\|null` | `null` | 初始缩放倍率（相对于图片原始尺寸）。`null` 时自动适配容器；设了则以 `initialCenter` 为锚点。 |
 | `initialCenter` | `{ x, y }` | `{ x: 0, y: 0 }` | 初始视口中心（用户坐标，相对原点）。`initialScale` 为 `null` 时忽略。 |
 | `boundaryMargin` | `Number` | `100` | 平移 / 缩放时允许的最大背景边距（px）。地图不能被拖到距容器边超过该距离，也不能缩到比适配容器更小。 |
 | `icons` | `Function` | `null` | 图标解析器：`(desc) => 组件 | null`。接收标注的 `icon` 字段（如 `{lucide:'Home'}`）并返回 Vue 组件。为 `null` 时 `icon` 被当作图片 URL 处理。 |
-| `styles` | `Array<{ fontSize?, fontWeight?, color?, stroke?, textShadow? }>` | `[]` | 标注样式组（与 `level` 正交的另一维度）。每个标注通过 `style` 字段引用一个下标；组内未填写的字段、以及越界 / `-1` 下标均回退到组件默认样式。 |
+| `styles` | `Array<{ fontSize?, fontWeight?, color?, stroke?, textShadow?, iconColor?, iconBg? }>` | `[]` | 标注样式组。每个标注通过 `style` 字段引用一个下标；组内未填写的字段、以及越界 / `-1` 下标均回退到组件默认样式。 |
 | `showCoordinate` | `Boolean` | `true` | 是否显示光标的实时坐标读数。 |
 | `coordinatePrecision` | `Number` | `1` | 坐标读数的小数位数。 |
+| `debug` | `Boolean` | `false` | 调试模式：左键点击复制 `x: %d, y: %d`（用户坐标）；右键复制 `x: %d, y: %d, visible: %.2f`（坐标+缩放倍率）。 |
 
 ### annotations
 
@@ -127,26 +127,24 @@ const annotations = [
 type Annotation = {
   id: string | number   // 稳定的 key，也会通过事件回传
   x: number              // 用户坐标 x（+x 向右）
-  y: number              // 用户坐标 y（+y 向下）
-  text: string           // 标注文字
-  level?: number         // 显示层级（-1 = 始终可见 · 0,1,2… = 对应 levelThresholds 下标）
+  x?: number             // 用户坐标 x（+x 向右）；不填则隐藏
+  y?: number             // 用户坐标 y（+y 向下）；不填则隐藏
+  text: string           // 标注文字；用 \n 换行（每行各自居中）
+  visible?: number       // 0 / 不填 = 始终可见 · < 0 = 永远不可见 · > 0 = scale >= 该值
   style?: number         // 指向组件 `styles` prop 的下标（默认 -1）
   icon?: string | object // 图片 URL，或传给 `icons()` 的描述符（如 {lucide:'Home'}）
 }
 ```
 
-### 层级可见性
+### 可见性
 
-`level[i]` 是一个**缩放倍率**（相对于图片原始大小），达到后**第 `i` 级**
-标注开始显示。**层级编号就是数组下标**：
+每个标注携带一个数字 `visible` 阈值：
 
-- `-1` 级（默认）—— 始终显示，标记值，与 `styles[-1]` 同语义。
-- `0` 级 —— `scale >= levelThresholds[0]` 时显示（默认 `0.4`）
-- `1` 级 —— `scale >= levelThresholds[1]` 时显示（默认 `0.8`）
-- `2`、`3`、... 级 —— 若对应数组条目缺失 / 越界则回退为始终显示 ——
-  与 `styles` prop 的越界回退语义一致。
+- `visible: 0` 或不填 —— 始终可见。
+- `visible: <0` —— 永远不可见。
+- `visible: >0` —— 缩放倍率 `scale >= 该值` 时才显示。
 
-因此你可以精确控制存在几档、每档在什么缩放比例下出现。
+`x` 或 `y` 不填的标注始终隐藏。
 
 ### 按标注独立的样式组
 

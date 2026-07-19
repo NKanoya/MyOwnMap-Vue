@@ -128,42 +128,39 @@ from the origin" on the underlying image.
 | `styles` | `Array<{ fontSize?, fontWeight?, color?, stroke?, textShadow? }>` | `[]` | Per-label style groups. Each annotation points at one via its `style` index; omitted fields and out-of-range / `-1` indices fall back to the component defaults. Independent of `level`. |
 | `showCoordinate` | `Boolean` | `true` | Show the live cursor coordinate readout. |
 | `coordinatePrecision` | `Number` | `1` | Decimal places in the readout. |
+| `debug` | `Boolean` | `false` | Left click copies `x: %d, y: %d` (user coords) to clipboard; right click copies `x: %d, y: %d, visible: %.2f` (coords + scale). |
 
 ### annotations
 
 ```ts
 type Annotation = {
   id: string | number   // stable key, also echoed by events
-  x: number              // user-space x (+x → right)
-  y: number              // user-space y (+y → down)
+  x?: number             // user-space x (+x → right); omit to hide
+  y?: number             // user-space y (+y → down); omit to hide
   text: string           // label text; use \n for multi-line (each line is centered)
-  level?: number         // -1 = always · 0,1,2… = reads levelThresholds[i]
+  visible?: number       // 0 / unset = always · < 0 = never · > 0 = scale >= value
   style?: number         // index into the component's `styles` prop (default -1)
   icon?: string | object // image URL, or a descriptor passed to `icons()` (e.g. {lucide:'Home'})
 }
 ```
 
-### Level visibility
+### Visibility
 
-`level[i]` is the zoom factor (multiple of the image's natural size) at which
-**level `i`** becomes visible. The level number IS the array index:
+Each annotation carries a numeric `visible` threshold:
 
-- level `-1` (default) — always visible, the sentinel. Matches `styles[-1]`.
-- level `0` — visible once `scale >= levelThresholds[0]`  (default `0.4`)
-- level `1` — visible once `scale >= levelThresholds[1]`  (default `0.8`)
-- level `2`, `3`, … — if the matching array entry is missing / undefined, the
-  tier falls back to always visible — the same out-of-range fallback as the
-  `styles` prop.
+- `visible: 0` or unset — always visible.
+- `visible: <0` — never visible.
+- `visible: >0` — visible only once zoom `scale >= value`.
 
-This gives exact control over how many tiers exist and where each kicks in.
+Annotations with `x` or `y` omitted are always hidden.
 
 ### Per-label style groups
 
-`styles` is an array of `{ fontSize?, color? }` groups — a second axis
-independent of `level`. Each annotation declares its group via `style`
-(default `-1`, meaning component defaults). Group members override only the
-fields they declare; everything else (weight, outline, shadow) stays at the
-component defaults. An out-of-range index behaves like `-1`.
+`styles` is an array of `{ fontSize?, color?, fontWeight?, stroke?, textShadow?, iconColor?, iconBg? }` groups.
+Each annotation declares its group via `style` (default `-1`, meaning component
+defaults). Group members override only the fields they declare; everything else
+(weight, outline, shadow) stays at the component defaults. An out-of-range index
+behaves like `-1`.
 
 ```js
 const styles = [

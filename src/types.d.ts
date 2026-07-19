@@ -5,8 +5,8 @@ export type Origin = { x: number; y: number }
 
 export type Annotation = {
   id: string | number
-  x: number
-  y: number
+  x?: number // user-space x; if omitted, the annotation is hidden
+  y?: number // user-space y; if omitted, the annotation is hidden
   text: string // use \n for multi-line (each line is centered)
   visible?: number // zoom threshold: 0 / unset = always visible · < 0 = never · > 0 = scale >= value
   style?: number // index into the component's `styles` prop; -1 / missing = default

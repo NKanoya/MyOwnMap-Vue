@@ -78,6 +78,10 @@ const props = defineProps({
 
   // number of decimals for the coordinate readout
   coordinatePrecision: { type: Number, default: 1 },
+
+  // debug mode: left click copies "x: %d, y: %d" (user coords) to clipboard;
+  // right click copies "x: %d, y: %d, visible: %.2f" (user coords + scale).
+  debug: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['ready', 'view-change', 'annotation-click', 'annotation-hover'])
@@ -156,6 +160,8 @@ const positionedLabels = computed(() => {
   const { scale, offsetX, offsetY } = buffered.value
   return props.annotations
     .filter((a) => {
+      // x or y missing → hidden (0 is a valid coordinate, so check strictly)
+      if (a.x == null || a.y == null) return false;
       const t = a.visible;
       if (t == null || t === 0) return true; // always visible
       if (t < 0) return false;               // never visible
@@ -208,8 +214,26 @@ function syncBuffered() {
   buffered.value = { scale: state.scale, offsetX: state.offsetX, offsetY: state.offsetY }
 }
 
+// ---- debug helpers ----
+function writeDebugCoords(e, withScale) {
+  if (!props.debug) return false
+  const rect = containerRef.value.getBoundingClientRect()
+  const { ux, uy } = screenToUser(e.clientX - rect.left, e.clientY - rect.top)
+  const text = withScale
+    ? `x: ${Math.round(ux)}, y: ${Math.round(uy)}, visible: ${state.scale.toFixed(2)}`
+    : `x: ${Math.round(ux)}, y: ${Math.round(uy)}`
+  navigator.clipboard.writeText(text).catch(() => {})
+  return true
+}
+
+function onContextMenu(e) {
+  writeDebugCoords(e, true)
+}
+
 // ---- pointer pan ----
 function onPointerDown(e) {
+  // debug left click: copy coords, don't pan
+  if (e.button === 0 && writeDebugCoords(e, false)) return
   // ignore clicks on label buttons
   if (e.target.closest('[data-map-label]')) return
   pan.value = { active: true, startX: e.clientX, startY: e.clientY, moved: false }
@@ -339,6 +363,7 @@ defineExpose({
       class="cmap-container"
       @pointerdown="onPointerDown"
       @pointermove="onPointerMoveContainer"
+      @contextmenu.prevent="onContextMenu"
       @pointerleave="onPointerLeaveContainer"
       @wheel="onWheel"
     >
