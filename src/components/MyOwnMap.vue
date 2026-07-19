@@ -23,8 +23,7 @@ const props = defineProps({
   },
 
   // developer-specified annotations in user coordinates.
-  // { id, x, y, text, level? } — level is 1 (default, always shown),
-  // 2+ (shown once zoom reaches the matching entry in levelThresholds).
+  // { id, x, y, text, visible? } — visible defaults to true.
   annotations: { type: Array, default: () => [] },
 
   // base font-size (px) for annotations — stays constant regardless of zoom
@@ -50,15 +49,6 @@ const props = defineProps({
   //
   // When unset, `icon` is treated as a plain image URL (legacy behavior).
   icons: { type: Function, default: null },
-
-  // per-level zoom thresholds (multiplier of natural size), indexed by
-  // (level - 2). level 1 is always shown. level 2 appears once scale >=
-  // levelThresholds[0], level 3 once scale >= levelThresholds[1], etc.
-  levelThresholds: {
-    type: Array,
-    default: () => [0.4, 0.8],
-    validator: (v) => Array.isArray(v) && v.every((n) => Number.isFinite(n) && n > 0),
-  },
 
   // render the base map with nearest-neighbor scaling (pixel art style)
   // instead of the browser's smooth interpolation. Default true.
@@ -132,16 +122,6 @@ const imageTransform = computed(
   () => `translate3d(${state.offsetX}px, ${state.offsetY}px, 0) scale(${state.scale})`,
 )
 
-// minimum scale a given annotation level needs before it shows.
-// - level -1 (default) → always visible — the sentinel, mirrors `styles[-1]`.
-// - level 0,1,2… → reads levelThresholds[i]; a missing / undefined entry
-//   falls back to 0 (always visible). Out-of-range indices always fall back.
-const thresholdForLevel = (level) => {
-  if (level < 0) return 0
-  const t = props.levelThresholds[level]
-  return t == null ? 0 : t
-}
-
 // Resolve a single annotation's style group, indexed by `a.style`. The group
 // only overrides `color` and `fontSize`; everything else (weight, outline,
 // shadow) stays at the component defaults. `style === -1` or an out-of-range
@@ -175,10 +155,19 @@ function resolveLabelStyle(a) {
 const positionedLabels = computed(() => {
   const { scale, offsetX, offsetY } = buffered.value
   return props.annotations
-    .filter((a) => scale >= thresholdForLevel(a.level ?? -1))
+    .filter((a) => {
+      const t = a.visible;
+      if (t == null || t === 0) return true; // always visible
+      if (t < 0) return false;               // never visible
+      return scale >= t;                     // visible when scale >= threshold
+    })
     .map((a) => {
       const { px, py } = userToImage(a.x, a.y)
-      return { ...a, sx: px * scale + offsetX, sy: py * scale + offsetY, resolvedStyle: resolveLabelStyle(a) }
+      // vertical offset: icon center (0.6rem) when present, otherwise center of the text block
+      const fontSize = resolveLabelStyle(a).fontSize;
+      const numLines = (a.text || '').split('\n').length;
+      const offsetRem = a.icon ? 0.6 : (fontSize * 1.2 * numLines) / 32;
+      return { ...a, sx: px * scale + offsetX, sy: py * scale + offsetY - offsetRem * 16, resolvedStyle: resolveLabelStyle(a) }
     })
 })
 

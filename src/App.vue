@@ -19,21 +19,21 @@ const styles = [
 ]
 
 // Annotations in user coordinates (+x right, +y down, image-pixel units).
-// level: -1 = always visible (default) · 0 = thresholds[0] · 1 = thresholds[1].
-// style: index into `styles`, -1 = default style.
+// visible: zoom scale threshold — annotation shows when scale >= value.
+// Negative / unset = always visible. style: index into `styles`, -1 = default.
 const annotations = [
-  { id: 1, x: -1200, y: -900,  text: 'Zone North-West',  level: -1, style: 1, icon: { lucide: 'Home' } },
-  { id: 2, x: 1100,  y: -800,  text: 'Zone North-East',  level: -1, style: 1, icon: { lucide: 'MapPin' } },
-  { id: 3, x: -1300, y: 700,   text: 'Zone\nSouth-West', level: -1, style: 2 },
-  { id: 4, x: 1200,  y: 600,   text: 'Zone South-East',  level: -1, style: 2 },
-  { id: 5, x: 0,     y: 0,     text: 'Origin',           level: -1, style: -1 },
-  { id: 6, x: -400,  y: -260,  text: 'Hall A',           level:  0, style: -1 },
-  { id: 7, x: 380,   y: -200,  text: 'Hall B',           level:  0, style: -1, icon: { lucide: 'Plane' } },
-  { id: 8, x: -300,  y: 260,   text: 'Garden',           level:  0, style: 2, icon: { lucide: 'Bookmark' } },
-  { id: 9, x: 420,   y: 200,   text: 'Cafeteria',        level:  0, style: 1 },
-  { id: 10, x: -120, y: -60,   text: 'Reception\ndesk',  level:  1, style: 1, icon: { lucide: 'Building' } },
-  { id: 11, x: 140,  y: 40,    text: 'Storage room',     level:  1, style: 2 },
-  { id: 12, x: -40,  y: 120,   text: 'Fire exit',        level:  1, style: 4 },
+  { id: 1, x: -1200, y: -900,  text: 'Zone North-West',  style: 1, icon: { lucide: 'Home' } },
+  { id: 2, x: 0,  y: 0,  text: 'Zone North-East',  style: 1, icon: { lucide: 'MapPin' } },
+  { id: 3, x: 0, y: 0,   text: 'Zone\nSouth-West', style: 2, visible: 0.5 },
+  { id: 4, x: 1200,  y: 600,   text: 'Zone South-East',  style: 2, visible: 0.5 },
+  { id: 5, x: 0,     y: 0,     text: 'Origin',           style: -1 },
+  { id: 6, x: -400,  y: -260,  text: 'Hall A',           style: -1, visible: 2.5 },
+  { id: 7, x: 380,   y: -200,  text: 'Hall B',           style: -1, icon: { lucide: 'Plane' }, visible: 2.5 },
+  { id: 8, x: -300,  y: 260,   text: 'Garden',           style: 2, icon: { lucide: 'Bookmark' }, visible: 1.2 },
+  { id: 9, x: 420,   y: 200,   text: 'Cafeteria',        style: 1, visible: 1.2 },
+  { id: 10, x: -120, y: -60,   text: 'Reception\ndesk',  style: 1, icon: { lucide: 'Building' }, visible: 3.0 },
+  { id: 11, x: 140,  y: 40,    text: 'Storage room',     style: 2, visible: 3.0 },
+  { id: 12, x: -40,  y: 120,   text: 'Fire exit',        style: 4, visible: -1 },
 ]
 
 // levelThresholds[i] is the zoom scale at which level i appears (-1 = always).
@@ -122,7 +122,7 @@ function onViewChange(v) {
     />
 
     <p v-if="view" style="color:#888; font-size: 0.85rem; margin-top: 0.5rem;">
-      scale: {{ view.scale.toFixed(3) }} · L0 {{ view.scale >= levelThresholds[0] ? 'visible' : 'hidden' }} · L1 {{ view.scale >= levelThresholds[1] ? 'visible' : 'hidden' }} · bold: {{ labelBold }}
+      scale: {{ view.scale.toFixed(3) }} · bold: {{ labelBold }}
     </p>
   </div>
 </template>

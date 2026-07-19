@@ -8,9 +8,9 @@ export type Annotation = {
   x: number
   y: number
   text: string // use \n for multi-line (each line is centered)
-  level?: number // -1 = always visible · 0,1,2... = reads levelThresholds[i]
+  visible?: number // zoom threshold: 0 / unset = always visible · < 0 = never · > 0 = scale >= value
   style?: number // index into the component's `styles` prop; -1 / missing = default
-  icon?: string // optional image URL rendered to the left of the text
+  icon?: string | object // image URL, or a descriptor passed to `icons()` (e.g. {lucide:'Home'})
 }
 
 export type LabelStyle = {
