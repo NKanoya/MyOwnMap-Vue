@@ -163,6 +163,8 @@ function resolveLabelStyle(a) {
     color: g?.color ?? '#fff',
     stroke: g?.stroke ?? '0.6px rgba(0, 0, 0, 0.55)',
     textShadow: g?.textShadow ?? '0 0 2px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.35)',
+    iconColor: g?.iconColor ?? null,
+    iconBg: g?.iconBg ?? null,
   }
 }
 
@@ -385,18 +387,27 @@ defineExpose({
           @click.stop="emit('annotation-click', a)"
           @mouseenter="emit('annotation-hover', a, $event)"
         >
-          <component
-            v-if="resolveIcon(a.icon)"
-            :is="resolveIcon(a.icon).component"
-            v-bind="resolveIcon(a.icon).props"
-            class="cmap-label-icon"
-          />
-          <img
-            v-else-if="a.icon && typeof a.icon === 'string'"
-            class="cmap-label-icon"
-            :src="a.icon"
-            alt=""
-          />
+          <div
+            v-if="resolveIcon(a.icon) || (a.icon && typeof a.icon === 'string')"
+            class="cmap-label-icon-wrap"
+            :style="{
+              background: a.resolvedStyle.iconBg ?? '#fff',
+              '--icon-color': a.resolvedStyle.iconColor ?? '#1a1a1a',
+            }"
+          >
+            <component
+              v-if="resolveIcon(a.icon)"
+              :is="resolveIcon(a.icon).component"
+              v-bind="resolveIcon(a.icon).props"
+              class="cmap-label-icon"
+            />
+            <img
+              v-else-if="a.icon && typeof a.icon === 'string'"
+              class="cmap-label-icon"
+              :src="a.icon"
+              alt=""
+            />
+          </div>
           <span
             v-for="(line, idx) in (a.text || '').split('\n')"
             :key="idx"

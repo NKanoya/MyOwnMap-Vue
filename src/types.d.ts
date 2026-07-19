@@ -19,6 +19,8 @@ export type LabelStyle = {
   color?: string
   stroke?: string // e.g. "0.6px rgba(0,0,0,0.55)"
   textShadow?: string // e.g. "0 0 2px #000, 0 1px 3px rgba(0,0,0,0.35)"
+  iconColor?: string // icon fill/stroke (defaults to the label color)
+  iconBg?: string // rounded box behind the icon (default #fff)
 }
 
 export type ViewChangePayload = {
