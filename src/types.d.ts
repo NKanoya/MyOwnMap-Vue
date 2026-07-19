@@ -42,6 +42,6 @@ export declare function useMapTransform(): {
 }
 
 declare const _default: {
-  install(app: App, opts?: { primevuePlugin?: unknown }): void
+  install(app: App): void
 }
 export default _default

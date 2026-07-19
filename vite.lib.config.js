@@ -23,8 +23,9 @@ export default defineConfig({
       fileName: (format) => (format === 'cjs' ? 'index.cjs' : 'index.js'),
     },
     rollupOptions: {
-      // Stay out of the host app's hands — these are supplied by the consumer.
-      external: ['vue', 'primevue', 'primevue/button', '@primeuix/themes', 'primeicons'],
+      // vue is the only PrimeVue-free peer; primeicons stays bundled so the
+      // package's control icons work out of the box with zero host deps.
+      external: ['vue'],
       output: {
         globals: { vue: 'Vue' },
         assetFileNames: 'index[extname]', // index.css

@@ -34,21 +34,9 @@
 npm install @your-scope/custom-map-vue
 ```
 
-组件的控件用 **PrimeVue** 渲染，因此要求宿主工程已配置好 PrimeVue。如未安装
-请先装好 peer 依赖：
-
-```sh
-npm install primevue @primeuix/themes primeicons
-```
-
-> **许可证提示。** 本组件的控件使用 PrimeVue 渲染，其中 `@primeuix/themes`
-> 包是双许可的：开源项目免费，闭源 / 商业项目需付费。如果你的项目是开源的，
-> 控制台里出现的 "invalid PrimeUI licence" 警告对运行没有任何影响，可以忽略。
-> 如果你（或下游用户）将该组件用于商业产品，则需前往 <https://primeui.io>
-> 购买合法的 PrimeUI 许可证。
-
-在应用入口一次性挂载 PrimeVue（这是任何 PrimeVue 应用都要做的事，组件不会
-替你做这一步）：
+本组件**除 Vue 本身外零依赖**：控件是纯 HTML 按钮、样式内置在包里，图标字体
+`primeicons` 也随包一起发进去了。宿主工程不需要任何 PrimeVue 配置，只需要
+Vue >= 3.5。
 
 ```js
 // main.js

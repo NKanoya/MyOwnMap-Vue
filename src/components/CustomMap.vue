@@ -1,7 +1,6 @@
 <script setup>
 import { ref, shallowRef, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useMapTransform } from '@/composables/useMapTransform'
-import Button from 'primevue/button'
 
 const props = defineProps({
   // container dimensions — any CSS length (e.g. "800px", "100%")
@@ -336,11 +335,11 @@ defineExpose({
         x: {{ computedPointerUser.x }} &nbsp; y: {{ computedPointerUser.y }}
       </div>
 
-      <!-- floating zoom controls: flat horizontal row, grey hover/press -->
+      <!-- floating zoom controls: plain HTML buttons, black/white, no deps -->
       <div class="cmap-controls" role="group" aria-label="map controls">
-        <Button size="small" severity="secondary" icon="pi pi-plus" text @click="zoomIn" aria-label="zoom in" />
-        <Button size="small" severity="secondary" icon="pi pi-minus" text @click="zoomOut" aria-label="zoom out" />
-        <Button size="small" severity="secondary" icon="pi pi-home" text @click="resetView" aria-label="reset view" />
+        <button type="button" class="cmap-btn" @click="zoomIn" aria-label="zoom in"><i class="pi pi-plus" /></button>
+        <button type="button" class="cmap-btn" @click="zoomOut" aria-label="zoom out"><i class="pi pi-minus" /></button>
+        <button type="button" class="cmap-btn" @click="resetView" aria-label="reset view"><i class="pi pi-home" /></button>
       </div>
     </div>
   </div>
@@ -398,13 +397,34 @@ defineExpose({
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.15);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-
-  /* pure black & white — no theme primary color anywhere */
-  --p-button-text-color: #000;
-  --p-button-text-hover-bg: #000;
-  --p-button-text-hover-color: #fff;
-  --p-button-text-active-bg: #222;
-  --p-button-text-active-color: #fff;
+}
+.cmap-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  font-size: 0.85rem;
+  line-height: 1;
+  color: #000;
+  background: transparent;
+  border: none;
+  border-radius: 0.35rem;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.cmap-btn:hover {
+  background: #000;
+  color: #fff;
+}
+.cmap-btn:active {
+  background: #222;
+  color: #fff;
+}
+.cmap-btn:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 1px;
 }
 
 :deep(.p-button){
