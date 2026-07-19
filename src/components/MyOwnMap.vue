@@ -150,7 +150,7 @@ function resolveLabelStyle(a) {
 const positionedLabels = computed(() => {
   const { scale, offsetX, offsetY } = buffered.value
   return props.annotations
-    .filter((a) => scale >= thresholdForLevel(a.level || 1))
+    .filter((a) => scale >= thresholdForLevel(a.level ?? -1))
     .map((a) => {
       const { px, py } = userToImage(a.x, a.y)
       return { ...a, sx: px * scale + offsetX, sy: py * scale + offsetY, resolvedStyle: resolveLabelStyle(a) }
