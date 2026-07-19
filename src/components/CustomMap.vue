@@ -387,23 +387,24 @@ defineExpose({
 /* ---- floating zoom controls: flat grey pill row ---- */
 .cmap-controls {
   position: absolute;
-  right: 1rem;
-  bottom: 1rem;
+  right: 0.6rem;
+  bottom: 0.6rem;
   z-index: 5;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem;
-  border-radius: 0.6rem;
-  background: color-mix(in srgb, var(--p-surface-0) 80%, transparent);
-  border: 1px solid var(--p-surface-300);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  gap: 0.15rem;
+  padding: 0.2rem;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 
-  /* force neutral grey interaction — no theme primary color anywhere */
-  --p-button-text-hover-bg: var(--p-surface-200);
-  --p-button-text-active-bg: var(--p-surface-300);
-  --p-button-text-hover-color: var(--p-surface-800);
-  --p-button-text-active-color: var(--p-surface-900);
+  /* pure black & white — no theme primary color anywhere */
+  --p-button-text-color: #000;
+  --p-button-text-hover-bg: #000;
+  --p-button-text-hover-color: #fff;
+  --p-button-text-active-bg: #222;
+  --p-button-text-active-color: #fff;
 }
 .cmap-world {
   position: absolute;
