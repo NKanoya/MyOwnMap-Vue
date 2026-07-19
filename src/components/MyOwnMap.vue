@@ -54,6 +54,20 @@ const props = defineProps({
   // instead of the browser's smooth interpolation. Default true.
   pixelated: { type: Boolean, default: true },
 
+  // initial zoom scale (multiple of natural size). When omitted (or null) the
+  // image is auto-fitted to the container. When set, initialCenter is used as
+  // the anchor; if initialCenter is also omitted the origin is centered.
+  initialScale: { type: Number, default: null },
+
+  // initial view center expressed in user coordinates (relative to origin).
+  // Defaults to (0,0) — i.e. the origin itself. Ignored when initialScale is
+  // null (auto-fit always frames the whole image).
+  initialCenter: {
+    type: Object,
+    default: () => ({ x: 0, y: 0 }),
+    validator: (v) => Number.isFinite(v.x) && Number.isFinite(v.y),
+  },
+
   // show a live readout of the cursor's user-space coordinate
   showCoordinate: { type: Boolean, default: true },
 
@@ -70,6 +84,7 @@ const {
   userToScreen,
   screenToUser,
   fitToContainer,
+  centerAtScale,
   zoomAt,
   zoomBy,
   panBy,
@@ -159,7 +174,13 @@ function measureAndFit(forceFit = false) {
     containerW: rect.width,
     containerH: rect.height,
   })
-  if (forceFit) fitToContainer()
+  if (forceFit) {
+    if (props.initialScale != null) {
+      centerAtScale(props.initialScale, props.initialCenter.x, props.initialCenter.y)
+    } else {
+      fitToContainer()
+    }
+  }
   syncBuffered()
   emitViewChange()
 }
@@ -251,7 +272,11 @@ function zoomOut() {
   emitViewChange()
 }
 function resetView() {
-  reset()
+  if (props.initialScale != null) {
+    centerAtScale(props.initialScale, props.initialCenter.x, props.initialCenter.y)
+  } else {
+    reset()
+  }
   syncBuffered()
   emitViewChange()
 }

@@ -65,6 +65,15 @@ export function useMapTransform() {
     state.offsetY = (state.containerH - state.imageH * s) / 2
   }
 
+  // center the view on a user-space point at a given scale
+  function centerAtScale(scale, userX, userY) {
+    if (!state.imageW || !state.imageH || !state.containerW || !state.containerH) return
+    const { px, py } = userToImage(userX, userY)
+    state.scale = scale
+    state.offsetX = state.containerW / 2 - px * scale
+    state.offsetY = state.containerH / 2 - py * scale
+  }
+
   // zoom while keeping the screen point (anchorX, anchorY) fixed
   function zoomAt(anchorX, anchorY, factor) {
     const next = Math.min(50, Math.max(0.02, state.scale * factor))
@@ -97,6 +106,7 @@ export function useMapTransform() {
     userToScreen,
     screenToUser,
     fitToContainer,
+    centerAtScale,
     zoomAt,
     zoomBy,
     panBy,

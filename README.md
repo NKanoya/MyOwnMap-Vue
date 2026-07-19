@@ -1,11 +1,11 @@
-# my-own-map-vue
+# @nkanoya/my-own-map-vue
 
 English · [中文文档](./README.zh.md)
 
-A self-rolled image-map component for **Vue 3 + PrimeVue**. Drop in any image
-as a base map, then pan, zoom, and annotate it with a real pixel-space
-coordinate system — the thing you'd normally reach a mapping library for, but
-with **your own image**, no tiles, no network, no API key.
+A self-rolled image-map component for **Vue 3**. Drop in any image as a base
+map, then pan, zoom, and annotate it with a real pixel-space coordinate system
+— the thing you'd normally reach a mapping library for, but with **your own
+image**, no tiles, no network, no API key.
 
 > This is a **developer tool**: the developer wires up the image, the origin,
 > and the annotations. The end user just gets a finished, interactive map.
@@ -26,20 +26,19 @@ with **your own image**, no tiles, no network, no API key.
 - **Optional live coordinate readout** — cursor's user-space coordinate, hidable.
 - **Sharp-pixel base map** — pixelated (nearest-neighbor) rendering by default so
   zoomed-in maps stay crisp; toggleable.
-- PrimeVue-flavored UI with a small footprint.
+- Compact black/white UI with a small footprint.
 
 ---
 
 ## Install
 
 ```sh
-npm install my-own-map-vue
+npm install @nkanoya/my-own-map-vue
 ```
 
 This component is **dependency-free** aside from Vue itself: the controls are
-plain HTML buttons styled inside the package, and the icon font (`primeicons`)
-ships bundled. No PrimeVue setup is needed in the host project — you only need
-Vue >= 3.5.
+plain HTML buttons styled inside the package. No extra setup is needed in the
+host project — you only need Vue >= 3.5.
 
 ---
 
@@ -47,7 +46,7 @@ Vue >= 3.5.
 
 ```js
 // main.js — register globally (optional)
-import { install as installMap } from 'my-own-map-vue'
+import { install as installMap } from '@nkanoya/my-own-map-vue'
 
 app.use(installMap)
 ```
@@ -55,7 +54,7 @@ app.use(installMap)
 ```vue
 <!-- AnyView.vue — or import the component directly -->
 <script setup>
-import { CustomMap } from 'my-own-map-vue'
+import { MyOwnMap } from '@nkanoya/my-own-map-vue'
 
 const imageSrc = '/maps/my-map.png'
 
@@ -71,7 +70,7 @@ const annotations = [
 </script>
 
 <template>
-  <CustomMap
+  <MyOwnMap
     :imageSrc="imageSrc"
     :origin="origin"
     :annotations="annotations"
@@ -81,8 +80,9 @@ const annotations = [
 </template>
 ```
 
-The image auto-fits and centers on mount; annotations appear immediately.
-Drag to pan, scroll to zoom.
+On mount, the view uses `initialScale` + `initialCenter` if set, otherwise the
+image auto-fits the container. Annotations appear immediately. Drag to pan,
+scroll to zoom. The home button restores the initial view.
 
 ---
 
@@ -118,6 +118,8 @@ from the origin" on the underlying image.
 | `labelBold` | `Boolean` | `true` | Label weight: `true`→700, `false`→400. |
 | `levelThresholds` | `Array` | `[0.4, 0.8]` | Per-level zoom thresholds (see below). |
 | `pixelated` | `Boolean` | `true` | Render the base map with nearest-neighbor scaling (sharp pixels when zoomed) instead of smooth interpolation. |
+| `initialScale` | `Number\|null` | `null` | Initial zoom scale (multiple of natural size). When `null` the image auto-fits the container. When set, `initialCenter` is used as the anchor. |
+| `initialCenter` | `{ x, y }` | `{ x: 0, y: 0 }` | Initial view center in user coordinates (relative to origin). Ignored when `initialScale` is `null`. |
 | `styles` | `Array<{ fontSize?, color? }>` | `[]` | Per-label style groups. Each annotation points at one via its `style` index; omitted fields and out-of-range / `-1` indices fall back to the component defaults. Independent of `level`. |
 | `showCoordinate` | `Boolean` | `true` | Show the live cursor coordinate readout. |
 | `coordinatePrecision` | `Number` | `1` | Decimal places in the readout. |
@@ -190,14 +192,14 @@ without an API change.
 Access via template ref:
 
 ```vue
-<CustomMap ref="map" ... />
+<MyOwnMap ref="map" ... />
 ```
 
 ```js
 const map = ref(null)
 map.value.zoomIn()                  // +25% at view center
 map.value.zoomOut()                 // -20% at view center
-map.value.resetView()               // re-fit & center
+map.value.resetView()               // restore initial view
 map.value.getScale()                // → current scale factor
 map.value.userToScreen(ux, uy)      // → { sx, sy }
 map.value.screenToUser(sx, sy)      // → { ux, uy }
@@ -224,7 +226,7 @@ test image under `public/maps/` and point the demo's `imageSrc` at it.
 src/
   index.js                        # library entry
   types.d.ts                      # public type declarations
-  components/CustomMap.vue        # the component
+  components/MyOwnMap.vue         # the component
   composables/useMapTransform.js  # pure reactive transform math (no DOM)
   App.vue                         # local demo (not shipped)
 dist/                             # published output (git-ignored)

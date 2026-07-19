@@ -1,8 +1,8 @@
-# my-own-map-vue
+# @nkanoya/my-own-map-vue
 
 [English](./README.md) · 中文
 
-一个为 **Vue 3 + PrimeVue** 定制的自研图片地图组件。把任意图片当作底图，
+一个为 **Vue 3** 定制的自研图片地图组件。把任意图片当作底图，
 进行平移、缩放，并用一套**真正的像素坐标系**来标注 —— 效果类似你平时调用
 专业地图库得到的东西，但**图是你自己的**，无需瓦片、无需联网、无需 API key。
 
@@ -24,28 +24,18 @@
   的阈值后才出现。
 - **可选的实时坐标读数** —— 实时显示光标的用户坐标，可关闭。
 - **锐利像素底图** —— 默认以像素化（最近邻）渲染底图，放大后仍清晰锐利，可切换。
-- PrimeVue 风格、体积小巧。
+- 黑白紧凑的 UI、体积小巧。
 
 ---
 
 ## 安装
 
 ```sh
-npm install my-own-map-vue
+npm install @nkanoya/my-own-map-vue
 ```
 
-本组件**除 Vue 本身外零依赖**：控件是纯 HTML 按钮、样式内置在包里，图标字体
-`primeicons` 也随包一起发进去了。宿主工程不需要任何 PrimeVue 配置，只需要
+本组件**除 Vue 本身外零依赖**：控件是纯 HTML 按钮、样式内置在包里。宿主工程不需要任何额外配置，只需要
 Vue >= 3.5。
-
-```js
-// main.js
-import PrimeVue from 'primevue/config'
-import Aura from '@primeuix/themes/aura'
-import 'primeicons/primeicons.css'
-
-app.use(PrimeVue, { theme: { preset: Aura } })
-```
 
 ---
 
@@ -53,7 +43,7 @@ app.use(PrimeVue, { theme: { preset: Aura } })
 
 ```js
 // main.js —— 全局注册（可选）
-import { install as installMap } from 'my-own-map-vue'
+import { install as installMap } from "@nkanoya/my-own-map-vue"
 
 app.use(installMap)
 ```
@@ -61,7 +51,7 @@ app.use(installMap)
 ```vue
 <!-- 任意页面 —— 也可以直接 import 组件 -->
 <script setup>
-import { CustomMap } from 'my-own-map-vue'
+import { MyOwnMap } from "@nkanoya/my-own-map-vue"
 
 const imageSrc = '/maps/my-map.png'
 
@@ -77,7 +67,7 @@ const annotations = [
 </script>
 
 <template>
-  <CustomMap
+  <MyOwnMap
     :imageSrc="imageSrc"
     :origin="origin"
     :annotations="annotations"
@@ -87,7 +77,7 @@ const annotations = [
 </template>
 ```
 
-挂载后图片自动适配并居中，标注立即出现。拖拽平移、滚轮缩放。
+挂载时若设了 `initialScale` + `initialCenter` 则按该初始视口定位，否则图片自动适配容器。标注立即出现。拖拽平移、滚轮缩放，home 钮恢复初始视口。
 
 ---
 
@@ -123,6 +113,8 @@ const annotations = [
 | `labelBold` | `Boolean` | `true` | 标注字重：`true`→700，`false`→400。 |
 | `levelThresholds` | `Array` | `[0.4, 0.8]` | 层级显示阈值（见下文）。 |
 | `pixelated` | `Boolean` | `true` | 底图采用最近邻（nearest-neighbor）缩放——放大后像素锐利清晰，而非浏览器默认的平滑模糊。 |
+| `initialScale` | `Number\|null` | `null` | 初始缩放倍率（相对于图片原始尺寸）。`null` 时自动适配容器；设了则以 `initialCenter` 为锚点。 |
+| `initialCenter` | `{ x, y }` | `{ x: 0, y: 0 }` | 初始视口中心（用户坐标，相对原点）。`initialScale` 为 `null` 时忽略。 |
 | `styles` | `Array<{ fontSize?, color? }>` | `[]` | 标注样式组（与 `level` 正交的另一维度）。每个标注通过 `style` 字段引用一个下标；组内未填写的字段、以及越界 / `-1` 下标均回退到组件默认样式。 |
 | `showCoordinate` | `Boolean` | `true` | 是否显示光标的实时坐标读数。 |
 | `coordinatePrecision` | `Number` | `1` | 坐标读数的小数位数。 |
@@ -193,14 +185,14 @@ const annotations = [
 通过模板 ref 访问：
 
 ```vue
-<CustomMap ref="map" ... />
+<MyOwnMap ref="map" ... />
 ```
 
 ```js
 const map = ref(null)
 map.value.zoomIn()                  // 视图中心放大 25%
 map.value.zoomOut()                 // 视图中心缩小 20%
-map.value.resetView()               // 重新适配并居中
+map.value.resetView()               // 恢复初始视口
 map.value.getScale()                // → 当前缩放倍率
 map.value.userToScreen(ux, uy)      // → { sx, sy }
 map.value.screenToUser(sx, sy)      // → { ux, uy }
@@ -227,7 +219,7 @@ npm run dev
 src/
   index.js                        # 库入口
   types.d.ts                      # 公开类型声明
-  components/CustomMap.vue        # 组件本体
+  components/MyOwnMap.vue         # 组件本体
   composables/useMapTransform.js  # 纯响应式坐标换算逻辑（无 DOM）
   App.vue                         # 本地 demo（不随包发布）
 dist/                             # 发布产物（已 gitignore）
