@@ -24,6 +24,8 @@ with **your own image**, no tiles, no network, no API key.
 - **Per-level zoom gating** — level-1 labels always show; level-2, level-3, …
   appear only past a developer-defined zoom threshold.
 - **Optional live coordinate readout** — cursor's user-space coordinate, hidable.
+- **Sharp-pixel base map** — pixelated (nearest-neighbor) rendering by default so
+  zoomed-in maps stay crisp; toggleable.
 - PrimeVue-flavored UI with a small footprint.
 
 ---
@@ -129,6 +131,7 @@ from the origin" on the underlying image.
 | `labelFontSize` | `Number` | `14` | Label font size in px — constant at any zoom. |
 | `labelBold` | `Boolean` | `true` | Label weight: `true`→700, `false`→400. |
 | `levelThresholds` | `Array` | `[0.4, 0.8]` | Per-level zoom thresholds (see below). |
+| `pixelated` | `Boolean` | `true` | Render the base map with nearest-neighbor scaling (sharp pixels when zoomed) instead of smooth interpolation. |
 | `showCoordinate` | `Boolean` | `true` | Show the live cursor coordinate readout. |
 | `coordinatePrecision` | `Number` | `1` | Decimal places in the readout. |
 

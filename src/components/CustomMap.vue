@@ -39,6 +39,10 @@ const props = defineProps({
     validator: (v) => Array.isArray(v) && v.every((n) => Number.isFinite(n) && n > 0),
   },
 
+  // render the base map with nearest-neighbor scaling (pixel art style)
+  // instead of the browser's smooth interpolation. Default true.
+  pixelated: { type: Boolean, default: true },
+
   // show a live readout of the cursor's user-space coordinate
   showCoordinate: { type: Boolean, default: true },
 
@@ -272,6 +276,7 @@ defineExpose({
         <img
           ref="imageRef"
           class="cmap-image"
+          :class="{ 'cmap-image--smooth': !pixelated }"
           :src="imageSrc"
           :alt="imageAlt"
           draggable="false"
@@ -383,6 +388,12 @@ defineExpose({
 .cmap-image {
   display: block;
   pointer-events: none;
+  /* nearest-neighbor scaling: sharp pixels when zoomed, not blurry */
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.cmap-image--smooth {
+  image-rendering: auto;
 }
 .cmap-labels {
   position: absolute;

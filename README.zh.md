@@ -23,6 +23,7 @@
 - **按层级分档显示** —— 一级标注始终显示；二级、三级等要在放大到开发者设定
   的阈值后才出现。
 - **可选的实时坐标读数** —— 实时显示光标的用户坐标，可关闭。
+- **锐利像素底图** —— 默认以像素化（最近邻）渲染底图，放大后仍清晰锐利，可切换。
 - PrimeVue 风格、体积小巧。
 
 ---
@@ -127,6 +128,7 @@ const annotations = [
 | `labelFontSize` | `Number` | `14` | 标注字号（px）—— 任意缩放下保持不变。 |
 | `labelBold` | `Boolean` | `true` | 标注字重：`true`→700，`false`→400。 |
 | `levelThresholds` | `Array` | `[0.4, 0.8]` | 层级显示阈值（见下文）。 |
+| `pixelated` | `Boolean` | `true` | 底图采用最近邻（nearest-neighbor）缩放——放大后像素锐利清晰，而非浏览器默认的平滑模糊。 |
 | `showCoordinate` | `Boolean` | `true` | 是否显示光标的实时坐标读数。 |
 | `coordinatePrecision` | `Number` | `1` | 坐标读数的小数位数。 |
 

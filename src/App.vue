@@ -28,6 +28,7 @@ const annotations = [
 // levelThresholds[i] is the zoom scale at which level (i+2) appears.
 const levelThresholds = ref([0.4, 0.8])
 const labelBold = ref(true)
+const pixelated = ref(true)
 
 const mapRef = ref(null)
 const view = ref(null)
@@ -58,6 +59,10 @@ function onViewChange(v) {
         <input type="checkbox" v-model="labelBold" />
         bold
       </label>
+      <label style="display:inline-flex; align-items:center; gap:0.3rem;">
+        <input type="checkbox" v-model="pixelated" />
+        pixelated
+      </label>
     </div>
 
     <CustomMap
@@ -67,6 +72,7 @@ function onViewChange(v) {
       :annotations="annotations"
       :levelThresholds="levelThresholds"
       :labelBold="labelBold"
+      :pixelated="pixelated"
       :showCoordinate="true"
       :coordinatePrecision="1"
       width="100%"
