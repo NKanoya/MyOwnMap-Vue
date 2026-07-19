@@ -335,11 +335,17 @@ defineExpose({
         x: {{ computedPointerUser.x }} &nbsp; y: {{ computedPointerUser.y }}
       </div>
 
-      <!-- floating zoom controls: plain HTML buttons, black/white, no deps -->
+      <!-- floating zoom controls: plain HTML buttons with inline SVG icons -->
       <div class="cmap-controls" role="group" aria-label="map controls">
-        <button type="button" class="cmap-btn" @click="zoomIn" aria-label="zoom in"><i class="pi pi-plus" /></button>
-        <button type="button" class="cmap-btn" @click="zoomOut" aria-label="zoom out"><i class="pi pi-minus" /></button>
-        <button type="button" class="cmap-btn" @click="resetView" aria-label="reset view"><i class="pi pi-home" /></button>
+        <button type="button" class="cmap-btn" @click="zoomIn" aria-label="zoom in">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z" fill="currentColor" /></svg>
+        </button>
+        <button type="button" class="cmap-btn" @click="zoomOut" aria-label="zoom out">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 11h14v2H5z" fill="currentColor" /></svg>
+        </button>
+        <button type="button" class="cmap-btn" @click="resetView" aria-label="reset view">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M3 11.5L12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" fill="currentColor" /></svg>
+        </button>
       </div>
     </div>
   </div>
