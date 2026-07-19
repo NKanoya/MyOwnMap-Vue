@@ -68,6 +68,11 @@ const props = defineProps({
     validator: (v) => Number.isFinite(v.x) && Number.isFinite(v.y),
   },
 
+  // max background margin (px) allowed around the image when panning / zooming.
+  // The map cannot be panned further than this past the container edge, nor
+  // zoomed out beyond fitting the container. Default 100.
+  boundaryMargin: { type: Number, default: 100 },
+
   // show a live readout of the cursor's user-space coordinate
   showCoordinate: { type: Boolean, default: true },
 
@@ -176,6 +181,7 @@ function measureAndFit(forceFit = false) {
     imageH: naturalSize.value.h,
     containerW: rect.width,
     containerH: rect.height,
+    boundaryMargin: props.boundaryMargin,
   })
   if (forceFit) {
     if (props.initialScale != null) {
@@ -305,6 +311,7 @@ watch(() => [props.origin.x, props.origin.y], () => {
     imageH: naturalSize.value.h,
     containerW: containerRef.value?.getBoundingClientRect().width || 0,
     containerH: containerRef.value?.getBoundingClientRect().height || 0,
+    boundaryMargin: props.boundaryMargin,
   })
 })
 

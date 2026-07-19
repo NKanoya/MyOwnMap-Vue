@@ -82,7 +82,10 @@ const annotations = [
 
 On mount, the view uses `initialScale` + `initialCenter` if set, otherwise the
 image auto-fits the container. Annotations appear immediately. Drag to pan,
-scroll to zoom. The home button restores the initial view.
+scroll to zoom. The home button restores the initial view. Panning and zooming
+are bounded by `boundaryMargin` — the map can't be dragged past the container
+edge (plus the margin) and can't zoom out smaller than the fit-to-container
+scale.
 
 ---
 
@@ -120,6 +123,7 @@ from the origin" on the underlying image.
 | `pixelated` | `Boolean` | `true` | Render the base map with nearest-neighbor scaling (sharp pixels when zoomed) instead of smooth interpolation. |
 | `initialScale` | `Number\|null` | `null` | Initial zoom scale (multiple of natural size). When `null` the image auto-fits the container. When set, `initialCenter` is used as the anchor. |
 | `initialCenter` | `{ x, y }` | `{ x: 0, y: 0 }` | Initial view center in user coordinates (relative to origin). Ignored when `initialScale` is `null`. |
+| `boundaryMargin` | `Number` | `100` | Max background margin (px) allowed when panning / zooming. The map can't be panned past this margin beyond the container edge, nor zoomed out smaller than fitting the container. |
 | `styles` | `Array<{ fontSize?, color? }>` | `[]` | Per-label style groups. Each annotation points at one via its `style` index; omitted fields and out-of-range / `-1` indices fall back to the component defaults. Independent of `level`. |
 | `showCoordinate` | `Boolean` | `true` | Show the live cursor coordinate readout. |
 | `coordinatePrecision` | `Number` | `1` | Decimal places in the readout. |
@@ -132,7 +136,7 @@ type Annotation = {
   x: number              // user-space x (+x → right)
   y: number              // user-space y (+y → down)
   text: string           // label text
-  level?: 1 | 2 | 3      // visibility tier (default 1)
+  level?: number         // visibility tier (-1 = always · 0,1,2… = levelThresholds index)
   style?: number         // index into the component's `styles` prop (default -1)
 }
 ```

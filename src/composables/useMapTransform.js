@@ -22,15 +22,46 @@ export function useMapTransform() {
     containerH: 0,
     imageW: 0,
     imageH: 0,
+    boundaryMargin: 100,
   })
 
-  function configure({ originX = 0, originY = 0, imageW = 0, imageH = 0, containerW = 0, containerH = 0 }) {
+  function configure({ originX = 0, originY = 0, imageW = 0, imageH = 0, containerW = 0, containerH = 0, boundaryMargin = 100 }) {
     state.originX = originX
     state.originY = originY
     state.imageW = imageW
     state.imageH = imageH
     state.containerW = containerW
     state.containerH = containerH
+    state.boundaryMargin = boundaryMargin
+  }
+
+  // the smallest scale that still covers the container in both dimensions
+  function fitScale() {
+    if (!state.imageW || !state.imageH || !state.containerW || !state.containerH) return 0.02
+    return Math.min(state.containerW / state.imageW, state.containerH / state.imageH)
+  }
+
+  // keep the mapped image within container bounds + an allowed background margin
+  function clampOffset() {
+    const m = state.boundaryMargin
+    const imgW = state.imageW * state.scale
+    const imgH = state.imageH * state.scale
+
+    if (imgW <= state.containerW) {
+      state.offsetX = (state.containerW - imgW) / 2
+    } else {
+      const minX = state.containerW - imgW - m
+      const maxX = m
+      state.offsetX = Math.min(maxX, Math.max(minX, state.offsetX))
+    }
+
+    if (imgH <= state.containerH) {
+      state.offsetY = (state.containerH - imgH) / 2
+    } else {
+      const minY = state.containerH - imgH - m
+      const maxY = m
+      state.offsetY = Math.min(maxY, Math.max(minY, state.offsetY))
+    }
   }
 
   // user coord -> image pixel
@@ -74,13 +105,16 @@ export function useMapTransform() {
     state.offsetY = state.containerH / 2 - py * scale
   }
 
-  // zoom while keeping the screen point (anchorX, anchorY) fixed
+  // zoom while keeping the screen point (anchorX, anchorY) fixed; clamp scale to
+  // never go below fitScale (whole image stays at least covering the container)
   function zoomAt(anchorX, anchorY, factor) {
-    const next = Math.min(50, Math.max(0.02, state.scale * factor))
+    const min = fitScale()
+    const next = Math.min(50, Math.max(min, state.scale * factor))
     const ratio = next / state.scale
     state.offsetX = anchorX - (anchorX - state.offsetX) * ratio
     state.offsetY = anchorY - (anchorY - state.offsetY) * ratio
     state.scale = next
+    clampOffset()
   }
 
   function zoomBy(anchorX, anchorY, deltaY) {
@@ -92,6 +126,7 @@ export function useMapTransform() {
   function panBy(dx, dy) {
     state.offsetX += dx
     state.offsetY += dy
+    clampOffset()
   }
 
   function reset() {
@@ -107,6 +142,8 @@ export function useMapTransform() {
     screenToUser,
     fitToContainer,
     centerAtScale,
+    fitScale,
+    clampOffset,
     zoomAt,
     zoomBy,
     panBy,
