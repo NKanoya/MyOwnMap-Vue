@@ -338,9 +338,9 @@ defineExpose({
 
       <!-- floating zoom controls: flat horizontal row, grey hover/press -->
       <div class="cmap-controls" role="group" aria-label="map controls">
-        <Button icon="pi pi-plus" text @click="zoomIn" aria-label="zoom in" />
-        <Button icon="pi pi-minus" text @click="zoomOut" aria-label="zoom out" />
-        <Button icon="pi pi-home" text @click="resetView" aria-label="reset view" />
+        <Button size="small" severity="secondary" icon="pi pi-plus" text @click="zoomIn" aria-label="zoom in" />
+        <Button size="small" severity="secondary" icon="pi pi-minus" text @click="zoomOut" aria-label="zoom out" />
+        <Button size="small" severity="secondary" icon="pi pi-home" text @click="resetView" aria-label="reset view" />
       </div>
     </div>
   </div>
@@ -395,7 +395,7 @@ defineExpose({
   gap: 0.15rem;
   padding: 0.2rem;
   border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.15);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 
@@ -406,6 +406,11 @@ defineExpose({
   --p-button-text-active-bg: #222;
   --p-button-text-active-color: #fff;
 }
+
+:deep(.p-button){
+
+}
+
 .cmap-world {
   position: absolute;
   top: 0;

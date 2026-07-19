@@ -43,6 +43,13 @@ PrimeVue setup in the host project. Install the peers if you haven't:
 npm install primevue @primeuix/themes primeicons
 ```
 
+> **License note.** This component renders its controls with PrimeVue, whose
+> `@primeuix/themes` package is dual-licensed: free for open-source use, paid
+> for closed-source / commercial use. If your project is open-source you can
+> ignore any "invalid PrimeUI licence" warning — it has no effect on behavior.
+> If you (or a downstream user) ship this in a commercial product, you need a
+> valid PrimeUI licence from <https://primeui.io>.
+
 Wire PrimeVue once in your app entry (this is the same step any PrimeVue app
 does — not something the component does for you):
 
