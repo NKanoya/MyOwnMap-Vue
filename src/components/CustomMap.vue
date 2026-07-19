@@ -374,18 +374,18 @@ defineExpose({
 /* ---- coordinate readout ---- */
 .cmap-coordinate {
   position: absolute;
-  top: 1rem;
-  left: 1rem;
+  top: 0.6rem;
+  left: 0.6rem;
   z-index: 5;
-  padding: 0.3rem 0.7rem;
-  font-size: 0.8rem;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.78rem;
   font-variant-numeric: tabular-nums;
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  color: var(--p-surface-700);
-  background: color-mix(in srgb, var(--p-surface-0) 80%, transparent);
-  border: 1px solid var(--p-surface-300);
+  color: #000;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
   pointer-events: none;
 }
 
