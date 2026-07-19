@@ -1,11 +1,12 @@
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 
 // Build that produces the published library (dist/). The dev/demo setup
 // keeps using the default vite.config.js so `npm run dev` is untouched.
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), cssInjectedByJsPlugin()],
   // The library has no use for public/ assets (favicon, sample maps) and
   // must not copy them in — otherwise a 13 MB test.png leaks into the bundle.
   publicDir: false,
