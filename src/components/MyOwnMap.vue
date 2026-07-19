@@ -118,10 +118,14 @@ const imageTransform = computed(
 )
 
 // minimum scale a given annotation level needs before it shows.
-// level 1 → 0 (always). level N>=2 → levelThresholds[N-2] (undefined = never).
+// - level <= 1 → always visible (tier 1 = default).
+// - level N>=2 → levelThresholds[N-2]; if the entry is missing / undefined
+//   the tier falls back to 0 (always visible), mirroring the `styles[-1]`
+//   out-of-range fallback.
 const thresholdForLevel = (level) => {
   if (level <= 1) return 0
-  return props.levelThresholds[level - 2] ?? Infinity
+  const t = props.levelThresholds[level - 2]
+  return t == null ? 0 : t
 }
 
 // Resolve a single annotation's style group, indexed by `a.style`. The group

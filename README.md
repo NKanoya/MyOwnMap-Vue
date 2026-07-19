@@ -145,7 +145,9 @@ at which **level `i+2`** becomes visible:
 - level 1 — always visible (threshold 0)
 - level 2 — visible once `scale >= levelThresholds[0]`  (default `0.4`)
 - level 3 — visible once `scale >= levelThresholds[1]`  (default `0.8`)
-- levels beyond the array length never appear
+- levels beyond the array length, and any annotation with `level <= 1` or an
+  undefined entry, fall back to always visible — the same out-of-range
+  fallback as the `styles` prop.
 
 This gives exact control over how many tiers exist and where each kicks in.
 Out-of-gating labels simply don't render.
