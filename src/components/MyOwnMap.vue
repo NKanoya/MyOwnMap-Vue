@@ -1,3 +1,7 @@
+<script>
+export default { name: 'MyOwnMap' }
+</script>
+
 <script setup>
 import { ref, shallowRef, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useMapTransform } from '@/composables/useMapTransform'

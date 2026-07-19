@@ -1,4 +1,4 @@
-# @your-scope/custom-map-vue
+# my-own-map-vue
 
 English · [中文文档](./README.zh.md)
 
@@ -33,7 +33,7 @@ with **your own image**, no tiles, no network, no API key.
 ## Install
 
 ```sh
-npm install @your-scope/custom-map-vue
+npm install my-own-map-vue
 ```
 
 This component is **dependency-free** aside from Vue itself: the controls are
@@ -47,7 +47,7 @@ Vue >= 3.5.
 
 ```js
 // main.js — register globally (optional)
-import { install as installMap } from '@your-scope/custom-map-vue'
+import { install as installMap } from 'my-own-map-vue'
 
 app.use(installMap)
 ```
@@ -55,7 +55,7 @@ app.use(installMap)
 ```vue
 <!-- AnyView.vue — or import the component directly -->
 <script setup>
-import { CustomMap } from '@your-scope/custom-map-vue'
+import { CustomMap } from 'my-own-map-vue'
 
 const imageSrc = '/maps/my-map.png'
 

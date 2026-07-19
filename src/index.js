@@ -1,9 +1,9 @@
-import CustomMap from './components/CustomMap.vue'
+import MyOwnMap from './components/MyOwnMap.vue'
 import { useMapTransform } from './composables/useMapTransform.js'
 
-export { CustomMap, useMapTransform }
+export { MyOwnMap, useMapTransform }
 
 // Optional one-call install: registers the component globally.
 export function install(app) {
-  app.component('CustomMap', CustomMap)
+  app.component('MyOwnMap', MyOwnMap)
 }

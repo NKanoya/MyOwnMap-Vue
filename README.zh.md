@@ -1,4 +1,4 @@
-# @your-scope/custom-map-vue
+# my-own-map-vue
 
 [English](./README.md) · 中文
 
@@ -31,7 +31,7 @@
 ## 安装
 
 ```sh
-npm install @your-scope/custom-map-vue
+npm install my-own-map-vue
 ```
 
 本组件**除 Vue 本身外零依赖**：控件是纯 HTML 按钮、样式内置在包里，图标字体
@@ -53,7 +53,7 @@ app.use(PrimeVue, { theme: { preset: Aura } })
 
 ```js
 // main.js —— 全局注册（可选）
-import { install as installMap } from '@your-scope/custom-map-vue'
+import { install as installMap } from 'my-own-map-vue'
 
 app.use(installMap)
 ```
@@ -61,7 +61,7 @@ app.use(installMap)
 ```vue
 <!-- 任意页面 —— 也可以直接 import 组件 -->
 <script setup>
-import { CustomMap } from '@your-scope/custom-map-vue'
+import { CustomMap } from 'my-own-map-vue'
 
 const imageSrc = '/maps/my-map.png'
 

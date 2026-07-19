@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import CustomMap from './components/CustomMap.vue'
+import MyOwnMap from './components/MyOwnMap.vue'
 
 // Test image lives in public/maps/ and is git-ignored — swap in your own.
 const imageSrc = '/maps/test.png'
@@ -48,7 +48,7 @@ function onViewChange(v) {
 
 <template>
   <div style="max-width: 1100px; margin: 2rem auto; padding: 0 1rem; font-family: sans-serif;">
-    <h1 style="margin-bottom: 0.25rem;">CustomMap demo</h1>
+    <h1 style="margin-bottom: 0.25rem;">MyOwnMap demo</h1>
     <p style="color:#666; margin-top: 0;">
       Origin set at image pixel (800, 500). Drag to pan, scroll to zoom.
       Labels have 3 visibility levels gated by zoom.
@@ -74,7 +74,7 @@ function onViewChange(v) {
       </label>
     </div>
 
-    <CustomMap
+    <MyOwnMap
       ref="mapRef"
       :imageSrc="imageSrc"
       :origin="origin"

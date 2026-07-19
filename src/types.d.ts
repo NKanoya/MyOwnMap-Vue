@@ -1,5 +1,5 @@
 import type { App } from 'vue'
-import type { CustomMap as _C } from './components/CustomMap.vue'
+import type { default as MyOwnMapType } from './components/MyOwnMap.vue'
 
 export type Origin = { x: number; y: number }
 
@@ -24,7 +24,7 @@ export type ViewChangePayload = {
   visibleUserRect: { x: number; y: number; w: number; h: number }
 }
 
-export interface CustomMapHandle {
+export interface MyOwnMapHandle {
   zoomIn(): void
   zoomOut(): void
   resetView(): void
@@ -33,7 +33,7 @@ export interface CustomMapHandle {
   screenToUser(sx: number, sy: number): { ux: number; uy: number }
 }
 
-export declare const CustomMap: typeof _C
+export declare const MyOwnMap: MyOwnMapType
 export declare function useMapTransform(): {
   userToScreen(ux: number, uy: number): { sx: number; sy: number }
   screenToUser(sx: number, sy: number): { ux: number; uy: number }
