@@ -45,7 +45,19 @@ const lucideIcons = {
   Home: { template: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>' },
   Plane: { template: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20M12 2v20"/></svg>' },
 }
-const getIcon = (desc) => (desc && desc.lucide ? lucideIcons[desc.lucide] : null)
+// Supports both {lucide:'Home'} (returns bare component) and
+// 'lucide:book-marked' (returns {component, props}) — matching the
+// <Icon name="lucide:..." /> pattern used in the host project.
+const Icon = null // stand-in for the host project's globally-registered <Icon>
+const getIcon = (desc) => {
+  if (typeof desc === 'string') {
+    return Icon ? { component: Icon, props: { name: desc } } : null
+  }
+  if (desc?.lucide && lucideIcons[desc.lucide]) {
+    return lucideIcons[desc.lucide]
+  }
+  return null
+}
 const labelBold = ref(true)
 const pixelated = ref(true)
 

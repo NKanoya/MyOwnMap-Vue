@@ -147,9 +147,13 @@ const thresholdForLevel = (level) => {
 // shadow) stays at the component defaults. `style === -1` or an out-of-range
 // index falls back to defaults.
 const baseFontWeight = computed(() => (props.labelBold ? 700 : 400))
-function resolveIconComponent(icon) {
-  if (!icon || typeof icon !== 'object' || typeof props.icons !== 'function') return null
-  return props.icons(icon) || null
+function resolveIcon(icon) {
+  if (!icon || typeof props.icons !== 'function') return null
+  const resolved = props.icons(icon)
+  if (!resolved) return null
+  // allow resolver to return { component, props } or a bare component
+  if (typeof resolved === 'object' && resolved.component) return resolved
+  return { component: resolved, props: {} }
 }
 function resolveLabelStyle(a) {
   const g = props.styles[a.style]
@@ -382,8 +386,9 @@ defineExpose({
           @mouseenter="emit('annotation-hover', a, $event)"
         >
           <component
-            :is="resolveIconComponent(a.icon)"
-            v-if="resolveIconComponent(a.icon)"
+            v-if="resolveIcon(a.icon)"
+            :is="resolveIcon(a.icon).component"
+            v-bind="resolveIcon(a.icon).props"
             class="cmap-label-icon"
           />
           <img

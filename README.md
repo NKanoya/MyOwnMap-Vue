@@ -124,7 +124,7 @@ from the origin" on the underlying image.
 | `initialScale` | `Number\|null` | `null` | Initial zoom scale (multiple of natural size). When `null` the image auto-fits the container. When set, `initialCenter` is used as the anchor. |
 | `initialCenter` | `{ x, y }` | `{ x: 0, y: 0 }` | Initial view center in user coordinates (relative to origin). Ignored when `initialScale` is `null`. |
 | `boundaryMargin` | `Number` | `100` | Max background margin (px) allowed when panning / zooming. The map can't be panned past this margin beyond the container edge, nor zoomed out smaller than fitting the container. |
-| `icons` | `Function` | `null` | Icon resolver: `(desc) => Component | null`. Receives the annotation's `icon` field (e.g. `{lucide:'Home'}`) and returns a Vue component. Leave `null` to treat `icon` as a plain image URL. |
+| `icons` | `Function` | `null` | Icon resolver: `(desc) => Component \| { component, props } | null`. Receives the annotation's `icon` field and returns a Vue component, or `{ component, props }` to also pass props. Leave `null` to treat `icon` as a plain image URL. |
 | `styles` | `Array<{ fontSize?, fontWeight?, color?, stroke?, textShadow? }>` | `[]` | Per-label style groups. Each annotation points at one via its `style` index; omitted fields and out-of-range / `-1` indices fall back to the component defaults. Independent of `level`. |
 | `showCoordinate` | `Boolean` | `true` | Show the live cursor coordinate readout. |
 | `coordinatePrecision` | `Number` | `1` | Decimal places in the readout. |
@@ -175,6 +175,35 @@ const annotations = [
   { id: 2, x: 200, y: 80, text: 'Warning', style: 1 },
   { id: 3, x: 0,   y: 0,  text: 'Plain',   style: -1 }, // default white
 ]
+```
+
+### Icons
+
+The `icons` resolver lets you wire any icon library without shipping it in the
+bundle. The annotation's `icon` field can be a string or any descriptor — the
+resolver decides what to render.
+
+```js
+// Globally registered <Icon name="lucide:..." /> (e.g. Nuxt, plugin, etc.)
+const getIcon = (desc) => {
+  if (typeof desc === 'string') {
+    return { component: Icon, props: { name: desc } };
+  }
+  return null;
+};
+const annotations = [
+  { id: 1, x: 100, y: 50, text: 'Library', icon: 'lucide:book-marked' },
+];
+```
+
+```js
+// lucide-vue-next (per-component import)
+import { Home, Plane } from 'lucide-vue-next';
+const lucideIcons = { Home, Plane };
+const getIcon = (desc) => (desc?.lucide ? lucideIcons[desc.lucide] : null);
+const annotations = [
+  { id: 1, x: 100, y: 50, text: 'Home', icon: { lucide: 'Home' } },
+];
 ```
 
 ---

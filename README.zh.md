@@ -167,6 +167,33 @@ const annotations = [
 ]
 ```
 
+### 图标
+
+`icons` 解析器让你接入任意图标库而无需将它打进包里。标注的 `icon` 字段可以是字符串或任意描述符——由解析器决定渲染什么。
+
+```js
+// 全局注册的 <Icon name="lucide:..." />（如 Nuxt 通过插件注册）
+const getIcon = (desc) => {
+  if (typeof desc === 'string') {
+    return { component: Icon, props: { name: desc } };
+  }
+  return null;
+};
+const annotations = [
+  { id: 1, x: 100, y: 50, text: '书店', icon: 'lucide:book-marked' },
+];
+```
+
+```js
+// lucide-vue-next（按需引入）
+import { Home, Plane } from 'lucide-vue-next';
+const lucideIcons = { Home, Plane };
+const getIcon = (desc) => (desc?.lucide ? lucideIcons[desc.lucide] : null);
+const annotations = [
+  { id: 1, x: 100, y: 50, text: '首页', icon: { lucide: 'Home' } },
+];
+```
+
 ---
 
 ## 事件
