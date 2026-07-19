@@ -1,17 +1,17 @@
 {
-  "name": "@your-scope/custom-map-vue",
+  "name": "@nkanoya/custom-map-vue",
   "version": "0.1.0",
   "description": "Self-rolled PrimeVue-flavored image-map component for Vue 3 — any image, pan/zoom, pixel-space annotations with per-level zoom gating.",
   "type": "module",
   "private": false,
   "license": "MIT",
   "keywords": ["vue", "vue3", "map", "image-map", "pan", "zoom", "annotation", "primevue"],
-  "homepage": "https://github.com/your-scope/custom-map-vue",
+  "homepage": "https://github.com/NKanoya/MyOwnMap-Vue",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-scope/custom-map-vue.git"
+    "url": "https://github.com/NKanoya/MyOwnMap-Vue.git"
   },
-  "bugs": "https://github.com/your-scope/custom-map-vue/issues",
+  "bugs": "https://github.com/NKanoya/MyOwnMap-Vue/issues",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/types.d.ts",
