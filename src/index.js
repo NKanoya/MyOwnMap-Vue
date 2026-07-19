@@ -1,3 +1,4 @@
+import './styles.css'
 import MyOwnMap from './components/MyOwnMap.vue'
 import { useMapTransform } from './composables/useMapTransform.js'
 
