@@ -41,3 +41,4 @@ __screenshots__/
 
 # Local test / dev-only maps (do not commit actual user/base-map files)
 public/maps/
+.npmrc
