@@ -9,6 +9,12 @@ export type Annotation = {
   y: number
   text: string
   level?: number
+  style?: number // index into the component's `styles` prop; -1 / missing = default
+}
+
+export type LabelStyle = {
+  fontSize?: number // px
+  color?: string
 }
 
 export type ViewChangePayload = {

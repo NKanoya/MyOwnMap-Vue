@@ -129,6 +129,7 @@ const annotations = [
 | `labelBold` | `Boolean` | `true` | 标注字重：`true`→700，`false`→400。 |
 | `levelThresholds` | `Array` | `[0.4, 0.8]` | 层级显示阈值（见下文）。 |
 | `pixelated` | `Boolean` | `true` | 底图采用最近邻（nearest-neighbor）缩放——放大后像素锐利清晰，而非浏览器默认的平滑模糊。 |
+| `styles` | `Array<{ fontSize?, color? }>` | `[]` | 标注样式组（与 `level` 正交的另一维度）。每个标注通过 `style` 字段引用一个下标；组内未填写的字段、以及越界 / `-1` 下标均回退到组件默认样式。 |
 | `showCoordinate` | `Boolean` | `true` | 是否显示光标的实时坐标读数。 |
 | `coordinatePrecision` | `Number` | `1` | 坐标读数的小数位数。 |
 
@@ -141,6 +142,7 @@ type Annotation = {
   y: number              // 用户坐标 y（+y 向下）
   text: string           // 标注文字
   level?: 1 | 2 | 3      // 显示层级（默认 1）
+  style?: number         // 指向组件 `styles` prop 的下标（默认 -1）
 }
 ```
 
@@ -156,6 +158,25 @@ type Annotation = {
 
 因此你可以精确控制存在几档、每档在什么缩放比例下出现。被门槛卡住的标注
 干脆不渲染，没有隐藏的 DOM。
+
+### 按标注独立的样式组
+
+`styles` 是 `{ fontSize?, color? }[]` 数组 —— 与 `level` 正交的另一维度。每个
+标注通过 `style` 字段指向数组里的某一项（默认 `-1`，表示"用组件默认"）。组内
+声明了什么字段就覆盖什么字段，其余（字重、描边、阴影）沿用组件默认；越界下标
+等同于 `-1`。
+
+```js
+const styles = [
+  { fontSize: 20, color: '#ffd166' }, // 下标 0
+  { color: '#ff5555' },               // 下标 1，字号用默认
+]
+const annotations = [
+  { id: 1, x: 100, y: 50, text: '重点', style: 0 },
+  { id: 2, x: 200, y: 80, text: '警告', style: 1 },
+  { id: 3, x: 0,   y: 0,  text: '普通', style: -1 }, // 默认白色
+]
+```
 
 ---
 

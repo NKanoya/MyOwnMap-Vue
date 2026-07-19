@@ -30,6 +30,14 @@ const props = defineProps({
   // toggle label weight — true = bold (700), false = normal (400)
   labelBold: { type: Boolean, default: true },
 
+  // style groups referenced by annotations via `style` index. Each group
+  // overrides whatever fields it declares; anything omitted falls back to
+  // the component defaults (labelFontSize / labelBold / outlined white).
+  styles: {
+    type: Array,
+    default: () => [],
+  },
+
   // per-level zoom thresholds (multiplier of natural size), indexed by
   // (level - 2). level 1 is always shown. level 2 appears once scale >=
   // levelThresholds[0], level 3 once scale >= levelThresholds[1], etc.
@@ -98,6 +106,22 @@ const thresholdForLevel = (level) => {
   return props.levelThresholds[level - 2] ?? Infinity
 }
 
+// Resolve a single annotation's style group, indexed by `a.style`. The group
+// only overrides `color` and `fontSize`; everything else (weight, outline,
+// shadow) stays at the component defaults. `style === -1` or an out-of-range
+// index falls back to defaults.
+const baseFontWeight = computed(() => (props.labelBold ? 700 : 400))
+function resolveLabelStyle(a) {
+  const g = props.styles[a.style]
+  return {
+    fontSize: g?.fontSize ?? props.labelFontSize,
+    fontWeight: baseFontWeight.value,
+    color: g?.color ?? '#fff',
+    stroke: '0.6px rgba(0, 0, 0, 0.55)',
+    textShadow: '0 0 2px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.35)',
+  }
+}
+
 // ---- annotations rendered in SCREEN space (outside the transformed world) ----
 // Recomputes in the same tick as the image transform (via buffered) so labels
 // never visibly lag; living outside the scaled world keeps text crisp.
@@ -108,7 +132,7 @@ const positionedLabels = computed(() => {
     .filter((a) => scale >= thresholdForLevel(a.level || 1))
     .map((a) => {
       const { px, py } = userToImage(a.x, a.y)
-      return { ...a, sx: px * scale + offsetX, sy: py * scale + offsetY }
+      return { ...a, sx: px * scale + offsetX, sy: py * scale + offsetY, resolvedStyle: resolveLabelStyle(a) }
     })
 })
 
@@ -295,8 +319,11 @@ defineExpose({
           :style="{
             left: a.sx + 'px',
             top: a.sy + 'px',
-            fontSize: labelFontSize + 'px',
-            fontWeight: labelBold ? 700 : 400,
+            fontSize: a.resolvedStyle.fontSize + 'px',
+            fontWeight: a.resolvedStyle.fontWeight,
+            color: a.resolvedStyle.color,
+            '-webkit-text-stroke': a.resolvedStyle.stroke,
+            textShadow: a.resolvedStyle.textShadow,
           }"
           data-map-label
           @click.stop="emit('annotation-click', a)"
@@ -405,13 +432,13 @@ defineExpose({
   position: absolute;
   transform: translateX(-50%);
   white-space: nowrap;
-  font-weight: 700;
   line-height: 1.2;
   pointer-events: auto;
   cursor: default;
-  /* outlined text: readable over any background color (green/blue/white/dark).
-     Falls back to plain white where -webkit-text-stroke is unsupported. */
+  /* text styling is driven inline by resolveLabelStyle(); these are just
+     hardcoded fallbacks in case the inline style is ever missing. */
   color: #fff;
+  font-weight: 700;
   -webkit-text-stroke: 0.6px rgba(0, 0, 0, 0.55);
   text-shadow:
     0 0 2px rgba(0, 0, 0, 0.45),

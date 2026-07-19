@@ -132,6 +132,7 @@ from the origin" on the underlying image.
 | `labelBold` | `Boolean` | `true` | Label weight: `true`→700, `false`→400. |
 | `levelThresholds` | `Array` | `[0.4, 0.8]` | Per-level zoom thresholds (see below). |
 | `pixelated` | `Boolean` | `true` | Render the base map with nearest-neighbor scaling (sharp pixels when zoomed) instead of smooth interpolation. |
+| `styles` | `Array<{ fontSize?, color? }>` | `[]` | Per-label style groups. Each annotation points at one via its `style` index; omitted fields and out-of-range / `-1` indices fall back to the component defaults. Independent of `level`. |
 | `showCoordinate` | `Boolean` | `true` | Show the live cursor coordinate readout. |
 | `coordinatePrecision` | `Number` | `1` | Decimal places in the readout. |
 
@@ -144,6 +145,7 @@ type Annotation = {
   y: number              // user-space y (+y → down)
   text: string           // label text
   level?: 1 | 2 | 3      // visibility tier (default 1)
+  style?: number         // index into the component's `styles` prop (default -1)
 }
 ```
 
@@ -159,6 +161,26 @@ at which **level `i+2`** becomes visible:
 
 This gives exact control over how many tiers exist and where each kicks in.
 Out-of-gating labels simply don't render.
+
+### Per-label style groups
+
+`styles` is an array of `{ fontSize?, color? }` groups — a second axis
+independent of `level`. Each annotation declares its group via `style`
+(default `-1`, meaning component defaults). Group members override only the
+fields they declare; everything else (weight, outline, shadow) stays at the
+component defaults. An out-of-range index behaves like `-1`.
+
+```js
+const styles = [
+  { fontSize: 20, color: '#ffd166' }, // index 0
+  { color: '#ff5555' },               // index 1, default size
+]
+const annotations = [
+  { id: 1, x: 100, y: 50, text: 'VIP',     style: 0 },
+  { id: 2, x: 200, y: 80, text: 'Warning', style: 1 },
+  { id: 3, x: 0,   y: 0,  text: 'Plain',   style: -1 }, // default white
+]
+```
 
 ---
 
