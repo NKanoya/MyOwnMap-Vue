@@ -7,9 +7,10 @@ export type Annotation = {
   id: string | number
   x: number
   y: number
-  text: string
-  level?: number
+  text: string // use \n for multi-line (each line is centered)
+  level?: number // -1 = always visible · 0,1,2... = reads levelThresholds[i]
   style?: number // index into the component's `styles` prop; -1 / missing = default
+  icon?: string // optional image URL rendered to the left of the text
 }
 
 export type LabelStyle = {

@@ -124,6 +124,7 @@ from the origin" on the underlying image.
 | `initialScale` | `Number\|null` | `null` | Initial zoom scale (multiple of natural size). When `null` the image auto-fits the container. When set, `initialCenter` is used as the anchor. |
 | `initialCenter` | `{ x, y }` | `{ x: 0, y: 0 }` | Initial view center in user coordinates (relative to origin). Ignored when `initialScale` is `null`. |
 | `boundaryMargin` | `Number` | `100` | Max background margin (px) allowed when panning / zooming. The map can't be panned past this margin beyond the container edge, nor zoomed out smaller than fitting the container. |
+| `icons` | `Function` | `null` | Icon resolver: `(desc) => Component | null`. Receives the annotation's `icon` field (e.g. `{lucide:'Home'}`) and returns a Vue component. Leave `null` to treat `icon` as a plain image URL. |
 | `styles` | `Array<{ fontSize?, fontWeight?, color?, stroke?, textShadow? }>` | `[]` | Per-label style groups. Each annotation points at one via its `style` index; omitted fields and out-of-range / `-1` indices fall back to the component defaults. Independent of `level`. |
 | `showCoordinate` | `Boolean` | `true` | Show the live cursor coordinate readout. |
 | `coordinatePrecision` | `Number` | `1` | Decimal places in the readout. |
@@ -135,9 +136,10 @@ type Annotation = {
   id: string | number   // stable key, also echoed by events
   x: number              // user-space x (+x → right)
   y: number              // user-space y (+y → down)
-  text: string           // label text
-  level?: number         // visibility tier (-1 = always · 0,1,2… = levelThresholds index)
+  text: string           // label text; use \n for multi-line (each line is centered)
+  level?: number         // -1 = always · 0,1,2… = reads levelThresholds[i]
   style?: number         // index into the component's `styles` prop (default -1)
+  icon?: string | object // image URL, or a descriptor passed to `icons()` (e.g. {lucide:'Home'})
 }
 ```
 

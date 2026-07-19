@@ -41,6 +41,16 @@ const props = defineProps({
     default: () => [],
   },
 
+  // icon resolver: a function that receives the annotation's `icon` field and
+  // returns a Vue component (or null). Use it to wire Lucide / Heroicons /
+  // any icon library without bundling it into this package:
+  //
+  //   :icons="getIcon"
+  //   getIcon: (desc) => desc?.lucide ? lucideIcons[desc.lucide] : null
+  //
+  // When unset, `icon` is treated as a plain image URL (legacy behavior).
+  icons: { type: Function, default: null },
+
   // per-level zoom thresholds (multiplier of natural size), indexed by
   // (level - 2). level 1 is always shown. level 2 appears once scale >=
   // levelThresholds[0], level 3 once scale >= levelThresholds[1], etc.
@@ -137,6 +147,10 @@ const thresholdForLevel = (level) => {
 // shadow) stays at the component defaults. `style === -1` or an out-of-range
 // index falls back to defaults.
 const baseFontWeight = computed(() => (props.labelBold ? 700 : 400))
+function resolveIconComponent(icon) {
+  if (!icon || typeof icon !== 'object' || typeof props.icons !== 'function') return null
+  return props.icons(icon) || null
+}
 function resolveLabelStyle(a) {
   const g = props.styles[a.style]
   return {
@@ -366,7 +380,24 @@ defineExpose({
           data-map-label
           @click.stop="emit('annotation-click', a)"
           @mouseenter="emit('annotation-hover', a, $event)"
-        >{{ a.text }}</div>
+        >
+          <component
+            :is="resolveIconComponent(a.icon)"
+            v-if="resolveIconComponent(a.icon)"
+            class="cmap-label-icon"
+          />
+          <img
+            v-else-if="a.icon && typeof a.icon === 'string'"
+            class="cmap-label-icon"
+            :src="a.icon"
+            alt=""
+          />
+          <span
+            v-for="(line, idx) in (a.text || '').split('\n')"
+            :key="idx"
+            class="cmap-label-line"
+          >{{ line }}</span>
+        </div>
       </div>
 
       <!-- live cursor coordinate readout (top-left), hideable via prop -->

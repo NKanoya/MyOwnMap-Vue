@@ -21,22 +21,31 @@ const styles = [
 // level: -1 = always visible (default) · 0 = thresholds[0] · 1 = thresholds[1].
 // style: index into `styles`, -1 = default style.
 const annotations = [
-  { id: 1, x: -1200, y: -900,  text: 'Zone North-West',  level: -1, style: 1 },
+  { id: 1, x: -1200, y: -900,  text: 'Zone North-West',  level: -1, style: 1, icon: { lucide: 'Home' } },
   { id: 2, x: 1100,  y: -800,  text: 'Zone North-East',  level: -1, style: 1 },
-  { id: 3, x: -1300, y: 700,   text: 'Zone South-West',  level: -1, style: 2 },
+  { id: 3, x: -1300, y: 700,   text: 'Zone\nSouth-West', level: -1, style: 2 },
   { id: 4, x: 1200,  y: 600,   text: 'Zone South-East',  level: -1, style: 2 },
   { id: 5, x: 0,     y: 0,     text: 'Origin',           level: -1, style: -1 },
   { id: 6, x: -400,  y: -260,  text: 'Hall A',           level:  0, style: -1 },
-  { id: 7, x: 380,   y: -200,  text: 'Hall B',           level:  0, style: -1 },
+  { id: 7, x: 380,   y: -200,  text: 'Hall B',           level:  0, style: -1, icon: { lucide: 'Plane' } },
   { id: 8, x: -300,  y: 260,   text: 'Garden',           level:  0, style: 2 },
   { id: 9, x: 420,   y: 200,   text: 'Cafeteria',        level:  0, style: 1 },
-  { id: 10, x: -120, y: -60,   text: 'Reception desk',   level:  1, style: 1 },
+  { id: 10, x: -120, y: -60,   text: 'Reception\ndesk',  level:  1, style: 1 },
   { id: 11, x: 140,  y: 40,    text: 'Storage room',     level:  1, style: 2 },
   { id: 12, x: -40,  y: 120,   text: 'Fire exit',        level:  1, style: 3 },
 ]
 
 // levelThresholds[i] is the zoom scale at which level i appears (-1 = always).
 const levelThresholds = ref([0.4, 0.8])
+
+// Icon resolver — wire any icon library without shipping it in the bundle.
+// Here's a Lucide-style mock: the annotation says {lucide: 'Home'} and we map
+// it to a Vue component. Swap the body with lucide-vue-next / heroicons / etc.
+const lucideIcons = {
+  Home: { template: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>' },
+  Plane: { template: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20M12 2v20"/></svg>' },
+}
+const getIcon = (desc) => (desc && desc.lucide ? lucideIcons[desc.lucide] : null)
 const labelBold = ref(true)
 const pixelated = ref(true)
 
@@ -84,6 +93,7 @@ function onViewChange(v) {
       :labelBold="labelBold"
       :pixelated="pixelated"
       :styles="styles"
+      :icons="getIcon"
       :showCoordinate="true"
       :coordinatePrecision="1"
       width="100%"

@@ -107,7 +107,10 @@
 .cmap-label {
   position: absolute;
   transform: translateX(-50%);
-  white-space: nowrap;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
   line-height: 1.2;
   pointer-events: auto;
   cursor: default;
@@ -118,4 +121,14 @@
     0 0 2px rgba(0, 0, 0, 0.45),
     0 1px 3px rgba(0, 0, 0, 0.35);
   paint-order: stroke fill;
+}
+.cmap-label-icon {
+  width: 1em;
+  height: 1em;
+  object-fit: contain;
+  flex: none;
+}
+.cmap-label-line {
+  white-space: nowrap;
+  text-align: center;
 }
