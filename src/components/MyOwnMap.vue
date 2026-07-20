@@ -158,7 +158,9 @@ function resolveLabelStyle(a) {
 // Per-level zoom gating: level 1 always, level 2+3 gated by their thresholds.
 const positionedLabels = computed(() => {
   const { scale, offsetX, offsetY } = buffered.value
-  return props.annotations
+  // flat + nested both work: [{...}, {...}] or [[...], [...]] -- one-pass flat
+  const all = props.annotations.flatMap((a) => (Array.isArray(a) ? a : [a]))
+  return all
     .filter((a) => {
       // x or y missing → hidden (0 is a valid coordinate, so check strictly)
       if (a.x == null || a.y == null) return false;
